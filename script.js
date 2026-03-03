@@ -190,25 +190,29 @@ function removeTrainee(index) {
     top11.splice(index, 1);
     renderTop11();
 }
-
-// ✅ 이미지 저장 함수 최적화 (정사각형 고정 및 로고 잘림 방지)
 async function saveAsImage() {
     const exportPyramid = document.getElementById("exportPyramid");
     const exportArea = document.getElementById("exportArea");
+    const saveBtn = document.getElementById("saveBtn");
     
+    // 1. 연습생 선택 확인
     if (top11.length === 0) {
-        alert("연습생을 선택해 주세요!");
+        alert("최소 1명 이상의 연습생을 선택해 주세요!");
         return;
     }
 
-    // 저장용 피라미드 생성 (실제 화면과 좌표 동일하게)
+    // 2. 버튼 잠시 비활성화 (여러번 클릭 방지)
+    saveBtn.disabled = true;
+    saveBtn.innerText = "이미지 생성 중...";
+
+    // 3. 저장 전용 피라미드 생성
     exportPyramid.innerHTML = "";
     const rows = [1, 2, 3, 5];
     let currentIdx = 0;
 
     rows.forEach(count => {
         const rowDiv = document.createElement("div");
-        rowDiv.style.cssText = "display: flex; justify-content: center; gap: 20px; width: 100%; margin-bottom: 5px;";
+        rowDiv.style.cssText = "display: flex; justify-content: center; gap: 20px; width: 100%;";
         for (let i = 0; i < count; i++) {
             const trainee = top11[currentIdx];
             const slot = document.createElement("div");
@@ -217,12 +221,12 @@ async function saveAsImage() {
                 slot.innerHTML = `
                     <div style="width: 110px; height: 110px; border-radius: 50%; border: 5px solid #0080ff; overflow: hidden; background: #fff; margin: 0 auto; position: relative;">
                         <img src="${trainee.img}" style="width: 100%; height: 100%; object-fit: cover;">
-                        <div style="position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); background: #0080ff; color: #fff; border-radius: 999px; font-weight: 900; font-size: 11px; padding: 3px 8px;">${currentIdx + 1}</div>
+                        <div style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); background: #0080ff; color: #fff; border-radius: 10px; font-weight: 900; font-size: 12px; padding: 2px 8px;">${currentIdx + 1}</div>
                     </div>
-                    <div style="margin-top: 8px; font-size: 16px; font-weight: 900; color: #111;">${trainee.name}</div>
+                    <div style="margin-top: 10px; font-size: 16px; font-weight: 900; color: #111;">${trainee.name}</div>
                 `;
             } else {
-                slot.innerHTML = `<div style="width: 110px; height: 110px; border-radius: 50%; background: #f4f4f4; margin: 0 auto;"></div>`;
+                slot.innerHTML = `<div style="width: 110px; height: 110px; border-radius: 50%; background: #f8f8f8; border: 2px dashed #ddd; margin: 0 auto;"></div>`;
             }
             rowDiv.appendChild(slot);
             currentIdx++;
@@ -231,33 +235,42 @@ async function saveAsImage() {
     });
 
     try {
-        // 폰트 대기 (저장 시 돋움체 계열 강제)
-        await document.fonts.ready;
-        await new Promise(resolve => setTimeout(resolve, 1200));
+        // 4. 이미지 로딩을 위한 짧은 대기
+        await new Promise(resolve => setTimeout(resolve, 800));
 
-        // html2canvas 설정: 기기별 창 크기 무시하고 무조건 1000x1000 가상 화면 구성
+        // 5. 정사각형 비율 유지를 위한 캔버스 크기 조정
+        //    피라미드 너비를 기준으로 높이를 동일하게 설정
+        const pyramidWidth = exportPyramid.offsetWidth;
+        const canvasSize = pyramidWidth; // 정사각형 크기
+
+        // 6. html2canvas 실행 (옵션 수정)
         const canvas = await html2canvas(exportArea, {
             scale: 2, 
-            useCORS: true,
+            useCORS: true, 
             backgroundColor: "#ffffff",
-            width: 1000,
-            height: 1000,
-            windowWidth: 1000, // ★ 가상 창 너비 강제 고정
-            windowHeight: 1000, // ★ 가상 창 높이 강제 고정
-            x: 0,
-            y: 0,
-            scrollX: 0,
-            scrollY: 0,
-            logging: false
+            width: canvasSize, // 캔버스 너비 설정
+            height: canvasSize, // 캔버스 높이 설정
+            onclone: (clonedDoc) => {
+                // 복제된 문서에서 캡처 영역을 보이게 처리
+                const target = clonedDoc.getElementById("exportArea");
+                if (target) {
+                    target.style.position = "static";
+                    target.style.visibility = "visible";
+                }
+            }
         });
 
-        
+        // 7. 이미지 다운로드
         const link = document.createElement("a");
-        link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
-        link.href = canvas.toDataURL("image/png", 1.0);
+        link.download = `TOP11_SHINSEKAI_${new Date().getTime()}.png`;
+        link.href = canvas.toDataURL("image/png");
         link.click();
     } catch (e) {
-        alert("이미지 저장에 실패했습니다.");
+        alert("이미지 저장에 실패했습니다. 다시 시도해 주세요.");
         console.error(e);
+    } finally {
+        // 8. 버튼 상태 복구
+        saveBtn.disabled = false;
+        saveBtn.innerText = "나의 TOP 11 이미지로 저장하기";
     }
 }
