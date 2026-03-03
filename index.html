@@ -6,6 +6,22 @@
     <title>PRODUCE 101 SHINSEKAI</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        /* 학교안심 바른돋움 폰트 강제 로드 */
+        @font-face {
+            font-family: 'HakgyoansimBareunDotum';
+            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2310@1.0/HakgyoansimBareunDotumR.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+            font-display: block;
+        }
+
+        /* 저장 영역의 모든 텍스트에 폰트 강제 적용 */
+        #exportArea * {
+            font-family: 'HakgyoansimBareunDotum', sans-serif !important;
+        }
+    </style>
 </head>
 <body>
     <div class="logo-container">
@@ -22,33 +38,25 @@
 
     <script src="trainees.js"></script>
     <script src="script.js"></script>
- <div id="exportArea" style="position: fixed; left: -9999px; top: 0; width: 1000px; height: 1000px; background: #ffffff; padding: 0; margin: 0; overflow: hidden;">
-    <div id="exportInner" style="width: 1000px; height: 1000px; position: relative; background: #ffffff; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 60px 0; box-sizing: border-box;">
-        
-        <div id="exportBanner" style="text-align: center;">
-            <img src="image/header--logo_clean.jpg" style="width: 600px; display: block; margin: 0 auto;">
-            <div style="margin-top: 15px; font-weight: 900; letter-spacing: .06em; font-size: 22px; color: #111; font-family: sans-serif;">
-                AUDITION PICK • YOUR TOP 11
+
+    <div id="exportArea" style="position: fixed; left: -9999px; top: 0; width: 1000px; height: 1000px; background: #ffffff; padding: 0; margin: 0; overflow: hidden; z-index: -1;">
+        <div id="exportInner" style="width: 1000px; height: 1000px; position: relative; background: #ffffff; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 60px 0; box-sizing: border-box;">
+            
+            <div id="exportBanner" style="text-align: center;">
+                <img src="image/header--logo_clean.jpg" style="width: 600px; display: block; margin: 0 auto;">
+                <div style="margin-top: 15px; font-weight: 900; letter-spacing: .06em; font-size: 22px; color: #111;">
+                    AUDITION PICK • YOUR TOP 11
+                </div>
+            </div>
+
+            <div id="exportPyramid" style="display: flex; flex-direction: column; gap: 30px; align-items: center; flex-grow: 1; justify-content: center; width: 100%;"></div>
+
+            <div style="width: 100%; text-align: center; padding-bottom: 25px; background: #ffffff;">
+                <span style="font-family: 'HakgyoansimBareunDotum', sans-serif !important; font-size: 20px; color: #888888 !important; font-weight: 400; letter-spacing: 0.05em;">
+                    created by @itterashaiyade
+                </span>
             </div>
         </div>
-
-        <div id="exportPyramid" style="display: flex; flex-direction: column; gap: 30px; align-items: center; flex-grow: 1; justify-content: center;"></div>
-
-        <div style="width: 100%; text-align: center; padding-bottom: 20px;">
-            <span style="font-family: 'HakgyoansimBareunDotum', 'Malgun Gothic', sans-serif; font-size: 18px; color: #888888; font-weight: 600; letter-spacing: 0.05em;">
-                created by @itterashaiyade
-            </span>
-        </div>
     </div>
-</div>
-
-<style>
-    @font-face {
-        font-family: 'HakgyoansimBareunDotum';
-        src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2310@1.0/HakgyoansimBareunDotumR.woff2') format('woff2');
-        font-weight: normal;
-        font-style: normal;
-    }
-</style>
 </body>
 </html>
