@@ -1,24 +1,23 @@
-<!DOCTYPE html>
-<html>
 <head>
   <meta charset="UTF-8">
   <title>PRODUCE 101 신세카이</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 
 <body>
 
   <h1>AUDITION PICK · YOUR TOP 11</h1>
 
-  <!-- 🔵 TOP11 표시 영역 -->
   <div id="top11" class="top11-container"></div>
 
-  <!-- 🔽 전체 연습생 리스트 -->
+  <div class="button-area">
+    <button onclick="saveAsImage()" class="save-btn">나의 TOP 11 이미지로 저장하기</button>
+  </div>
+
   <div id="trainee-list" class="grid"></div>
 
   <script src="trainees.js"></script>
   <script src="script.js"></script>
-
 </body>
-</html>
