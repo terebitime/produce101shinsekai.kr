@@ -121,7 +121,6 @@ const trainees = [
     { name: "오카모토 유토", img: "image/119.jpg" }
 ];
 
-// 2. 전역 변수 설정
 let top11 = [];
 const top11Container = document.getElementById("top11");
 
@@ -207,8 +206,8 @@ async function saveAsImage() {
 
     rows.forEach(count => {
         const rowDiv = document.createElement("div");
-        // 저장용 피라미드 줄 간격 촘촘하게 수정
-        rowDiv.style.cssText = "display: flex; justify-content: center; gap: 25px; width: 100%; margin-bottom: 5px;";
+        // 저장 시 줄 간격을 촘촘하게 고정 (정사각형을 위해)
+        rowDiv.style.cssText = "display: flex; justify-content: center; gap: 20px; width: 100%; margin-bottom: 5px;";
         for (let i = 0; i < count; i++) {
             const trainee = top11[currentIdx];
             const slot = document.createElement("div");
@@ -222,7 +221,7 @@ async function saveAsImage() {
                     <div style="margin-top: 8px; font-size: 16px; font-weight: 900; color: #111;">${trainee.name}</div>
                 `;
             } else {
-                slot.innerHTML = `<div style="width: 110px; height: 110px; border-radius: 50%; background: #f0f0f0; margin: 0 auto;"></div>`;
+                slot.innerHTML = `<div style="width: 110px; height: 110px; border-radius: 50%; background: #f4f4f4; margin: 0 auto;"></div>`;
             }
             rowDiv.appendChild(slot);
             currentIdx++;
@@ -239,7 +238,7 @@ async function saveAsImage() {
             useCORS: true,
             backgroundColor: "#ffffff",
             width: 1000,
-            height: 1000, // 정사각형 고정
+            height: 1000, // ★ 세로를 1000px로 강력하게 절단
             windowWidth: 1000,
             windowHeight: 1000,
             x: 0,
@@ -249,11 +248,11 @@ async function saveAsImage() {
         });
 
         const link = document.createElement("a");
-        link.download = "SHINSEKAI_TOP11.png";
-        link.href = canvas.toDataURL("image/png");
+        link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
+        link.href = canvas.toDataURL("image/png", 1.0);
         link.click();
     } catch (e) {
-        alert("저장 실패");
+        alert("이미지 저장에 실패했습니다.");
         console.error(e);
     }
 }
