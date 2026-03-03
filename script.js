@@ -146,95 +146,36 @@ function initTraineeList() {
 }
 
 // ✅ 1. 중복 알림 수정: 이름(name)을 직접 비교하여 확실하게 띄우기
-function selectTrainee(trainee) {
-    const isAlreadySelected = top11.some(item => item.name === trainee.name);
-    
-    if (isAlreadySelected) {
-        alert("이미 선택된 연습생입니다."); 
-        return;
-    }
-    
-    if (top11.length >= 11) {
-        alert("최대 11명까지만 선택할 수 있습니다.");
-        return;
-    }
-
-    top11.push(trainee);
-    renderTop11();
-}
-
-function renderTop11() {
-    if (!top11Container) return;
-    top11Container.innerHTML = "";
-    const rows = [1, 2, 3, 5];
-    let currentIdx = 0;
-    rows.forEach((count) => {
-        const rowDiv = document.createElement("div");
-        rowDiv.className = "pyramid-row";
-        for (let i = 0; i < count; i++) {
-            const trainee = top11[currentIdx];
-            const slot = document.createElement("div");
-            slot.className = "top-card-slot";
-            if (trainee) {
-                slot.innerHTML = `
-                    <div class="image-container">
-                        <img src="${trainee.img}">
-                        <div class="rank-badge">${currentIdx + 1}</div>
-                        <button class="remove-btn" onclick="event.stopPropagation(); removeTrainee(${currentIdx})">×</button>
-                    </div>
-                    <p class="name">${trainee.name}</p>`;
-            } else {
-                slot.innerHTML = `<div class="image-container empty"><div class="rank-badge">${currentIdx + 1}</div></div><p class="name">-</p>`;
-            }
-            rowDiv.appendChild(slot);
-            currentIdx++;
-        }
-        top11Container.appendChild(rowDiv);
-    });
-}
-
-function removeTrainee(index) {
-    top11.splice(index, 1);
-    renderTop11();
-}
-
-// ✅ 2. 저장 기능: 1000x1000 정사각형 사이즈 고정 및 중앙 배치
 async function saveAsImage() {
     const exportPyramid = document.getElementById("exportPyramid");
     const exportArea = document.getElementById("exportArea");
-    const exportInner = document.getElementById("exportInner"); // 내부 컨테이너
     
-    // 1. 저장 영역을 정사각형(1:1)으로 강제 고정 및 중앙 정렬 세팅
-    exportArea.style.cssText = "position: fixed; left: -9999px; top: 0; width: 1000px; height: 1000px; background: #ffffff;";
-    exportInner.style.cssText = "width: 1000px; height: 1000px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; padding: 40px 0;";
-    
-    // 2. 피라미드 영역 비우기
+    // 1. 저장용 영역 초기화
     exportPyramid.innerHTML = "";
     
-    // 3. 현재 선택된 멤버 데이터를 정사각형 규격에 맞춰 배치
+    // 2. 현재 선택된 멤버 데이터를 정사각형 규격에 맞춰 생성
     const rows = [1, 2, 3, 5];
     let currentIdx = 0;
 
     rows.forEach(count => {
         const rowDiv = document.createElement("div");
-        // 정사각형 안에서 너무 퍼지지 않도록 간격(gap)을 30px로 조정
-        rowDiv.style.cssText = "display: flex; justify-content: center; gap: 30px; width: 100%; margin-bottom: 25px;";
+        rowDiv.style.cssText = "display: flex; justify-content: center; gap: 35px; width: 100%;";
         
         for (let i = 0; i < count; i++) {
             const trainee = top11[currentIdx];
             const slot = document.createElement("div");
-            slot.style.cssText = "width: 120px; text-align: center;";
+            slot.style.cssText = "width: 125px; text-align: center;";
             
             if (trainee) {
                 slot.innerHTML = `
-                    <div style="width: 120px; height: 120px; border-radius: 50%; border: 5px solid #0080ff; overflow: hidden; background: #fff; box-shadow: 0 6px 12px rgba(0,0,0,0.1); margin: 0 auto; position: relative;">
+                    <div style="width: 120px; height: 120px; border-radius: 50%; border: 6px solid #0080ff; overflow: hidden; background: #fff; box-shadow: 0 8px 15px rgba(0,0,0,0.1); margin: 0 auto; position: relative;">
                         <img src="${trainee.img}" style="width: 100%; height: 100%; object-fit: cover;">
-                        <div style="position: absolute; bottom: -3px; left: 50%; transform: translateX(-50%); background: #0080ff; color: #fff; border-radius: 999px; font-weight: 900; font-size: 11px; padding: 3px 9px;">${currentIdx + 1}</div>
+                        <div style="position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); background: #0080ff; color: #fff; border-radius: 999px; font-weight: 900; font-size: 11px; padding: 4px 10px;">${currentIdx + 1}</div>
                     </div>
-                    <div style="margin-top: 12px; font-size: 16px; font-weight: 900; color: #111;">${trainee.name}</div>
+                    <div style="margin-top: 12px; font-size: 17px; font-weight: 900; color: #111; font-family: sans-serif;">${trainee.name}</div>
                 `;
             } else {
-                slot.innerHTML = `<div style="width: 120px; height: 120px; border-radius: 50%; background: #f5f5f5; margin: 0 auto;"></div>`;
+                slot.innerHTML = `<div style="width: 120px; height: 120px; border-radius: 50%; background: #f0f0f0; opacity: 0.5; margin: 0 auto;"></div>`;
             }
             rowDiv.appendChild(slot);
             currentIdx++;
@@ -242,18 +183,20 @@ async function saveAsImage() {
         exportPyramid.appendChild(rowDiv);
     });
 
-    // 4. 실제 캡처 작업 (정사각형 영역 지정)
+    // 3. 실제 캡처 작업 (정사각형 강제 설정)
     try {
-        await new Promise(resolve => setTimeout(resolve, 600)); // 이미지 로딩 대기
+        // 이미지 로딩을 위한 짧은 대기
+        await new Promise(resolve => setTimeout(resolve, 700));
 
         const canvas = await html2canvas(exportArea, {
             scale: 2, 
             useCORS: true,
             backgroundColor: "#ffffff",
-            width: 1000,   // 가로 1000px 고정
-            height: 1000,  // 세로 1000px 고정 (이게 없으면 길게 나옵니다)
+            width: 1000,   // 가로 고정
+            height: 1000,  // 세로 고정 (정사각형 유지 핵심)
             windowWidth: 1000,
-            windowHeight: 1000
+            windowHeight: 1000,
+            logging: false
         });
 
         const link = document.createElement("a");
