@@ -119,3 +119,71 @@ const trainees = [
   { name: "후지이 유세이", img: "image/118.jpg" },
   { name: "오카모토 유토", img: "image/119.jpg" }
 ];
+// (상단에 기존 연습생 데이터 리스트를 꼭 유지해 주세요!)
+
+let top11 = [];
+const top11Container = document.getElementById("top11");
+
+window.onload = function() {
+    initTraineeList();
+    renderTop11();
+};
+
+function initTraineeList() {
+    const listContainer = document.getElementById("trainee-list");
+    listContainer.innerHTML = "";
+    trainees.forEach((trainee) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `<img src="${trainee.img}"><p>${trainee.name}</p>`;
+        card.onclick = () => selectTrainee(trainee);
+        listContainer.appendChild(card);
+    });
+}
+
+function selectTrainee(trainee) {
+    if (top11.includes(trainee)) return;
+    if (top11.length >= 11) return;
+    top11.push(trainee);
+    renderTop11();
+}
+
+function renderTop11() {
+    top11Container.innerHTML = "";
+    const rows = [1, 2, 3, 5];
+    let currentIdx = 0;
+
+    rows.forEach((count) => {
+        const rowDiv = document.createElement("div");
+        rowDiv.className = "pyramid-row";
+        for (let i = 0; i < count; i++) {
+            const trainee = top11[currentIdx];
+            const slot = document.createElement("div");
+            slot.className = "top-card-slot";
+            if (trainee) {
+                slot.innerHTML = `
+                    <div class="image-container">
+                        <img src="${trainee.img}">
+                        <div class="rank-badge">${currentIdx + 1}</div>
+                    </div>
+                    <p class="name">${trainee.name}</p>
+                `;
+                slot.onclick = () => { top11.splice(top11.indexOf(trainee), 1); renderTop11(); };
+            } else {
+                slot.innerHTML = `<div class="image-container empty"><div class="rank-badge">${currentIdx + 1}</div></div><p class="name">-</p>`;
+            }
+            rowDiv.appendChild(slot);
+            currentIdx++;
+        }
+        top11Container.appendChild(rowDiv);
+    });
+}
+
+function saveAsImage() {
+    html2canvas(document.getElementById("top11"), { scale: 2 }).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+}
