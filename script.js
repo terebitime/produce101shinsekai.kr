@@ -235,21 +235,20 @@ async function saveAsImage() {
         await document.fonts.ready;
         await new Promise(resolve => setTimeout(resolve, 1200));
 
-
 const canvas = await html2canvas(exportArea, {
-   // script.js의 saveAsImage 함수 안의 html2canvas 부분을 아래로 교체
-const canvas = await html2canvas(exportArea, {
-    scale: 2,             // 선명도를 위해 2배 확대 (2000x2000 결과물)
+    scale: 2,
     useCORS: true,
     backgroundColor: "#ffffff",
     width: 1000,          // 가로 1000px 고정
     height: 1000,         // 세로 1000px 고정
-    windowWidth: 1000,    // 캡처 환경 가로 1000px 고정
-    windowHeight: 1000,   // 캡처 환경 세로 1000px 고정
+    windowWidth: 1000,    // 가상 창 가로 고정
+    windowHeight: 1000,   // 가상 창 세로 고정
+    x: 0,
+    y: 0,
     scrollX: 0,
     scrollY: 0,
-    x: 0,
-    y: 0
+    logging: false
+});
 });
 
         const link = document.createElement("a");
