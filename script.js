@@ -229,7 +229,7 @@ async function saveAsImage() {
     removeBtns.forEach(btn => btn.style.display = 'none');
 
     try {
-        // 로고 로딩을 위해 1초 대기
+        // 로딩 대기 (이미지 누락 방지)
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         const options = { 
@@ -245,38 +245,42 @@ async function saveAsImage() {
         const finalCanvas = document.createElement('canvas');
         const ctx = finalCanvas.getContext('2d');
 
-        // 가로 길이를 피라미드 영역(결과물)에 고정
-        const targetWidth = pyramidCanvas.width;
-        // 로고의 원래 비율을 유지하며 높이 재계산
-        const logoHeight = logoCanvas.height * (targetWidth / logoCanvas.width);
-        const footerHeight = 120; // 하단 여백 고정
+        // ✅ 결과물 가로 크기를 800px로 표준화 (사이즈 들쭉날쭉 방지)
+        const standardWidth = 800;
+        
+        // 로고 비율 재계산
+        const logoHeight = logoCanvas.height * (standardWidth / logoCanvas.width);
+        // 피라미드 영역 비율 재계산
+        const pyramidHeight = pyramidCanvas.height * (standardWidth / pyramidCanvas.width);
+        const footerHeight = 100; // 하단 아이디 영역
 
-        finalCanvas.width = targetWidth;
-        finalCanvas.height = logoHeight + pyramidCanvas.height + footerHeight;
+        finalCanvas.width = standardWidth;
+        finalCanvas.height = logoHeight + pyramidHeight + footerHeight;
 
         // 배경색 채우기
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
 
-        // 상단 로고 그리기 (비율 맞춤)
-        ctx.drawImage(logoCanvas, 0, 0, targetWidth, logoHeight);
+        // 1. 상단 로고 그리기 (정해진 너비에 맞춤)
+        ctx.drawImage(logoCanvas, 0, 0, standardWidth, logoHeight);
 
-        // 중앙 피라미드 그리기
-        ctx.drawImage(pyramidCanvas, 0, logoHeight);
+        // 2. 중앙 피라미드 그리기 (로고 바로 아래 밀착)
+        ctx.drawImage(pyramidCanvas, 0, logoHeight, standardWidth, pyramidHeight);
 
-        // 하단 @itterashaiyade (위치 고정)
-        ctx.fillStyle = "#000000";
-        ctx.font = "bold 32px sans-serif"; 
+        // 3. 하단 @itterashaiyade (위치 및 크기 고정)
+        ctx.fillStyle = "#333333";
+        ctx.font = "bold 24px sans-serif"; 
         ctx.textAlign = "right";
-        ctx.fillText("@itterashaiyade", finalCanvas.width - 40, finalCanvas.height - 50);
+        ctx.fillText("@itterashaiyade", finalCanvas.width - 40, finalCanvas.height - 40);
 
+        // 저장 실행
         const link = document.createElement("a");
         link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
-        link.href = finalCanvas.toDataURL("image/png", 1.0);
+        link.href = finalCanvas.toDataURL("image/png", 0.9);
         link.click();
         
     } catch (e) {
-        alert("이미지 생성 실패! 사파리 방문 기록을 삭제하고 다시 시도해 주세요.");
+        alert("저장에 실패했습니다. 사파리 방문 기록 삭제 후 다시 시도해 보세요!");
     } finally {
         removeBtns.forEach(btn => btn.style.display = 'flex');
     }
