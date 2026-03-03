@@ -126,12 +126,15 @@ let top11 = [];
 const top11Container = document.getElementById("top11");
 
 window.onload = function() {
-    initTraineeList();
+    if (typeof trainees !== 'undefined') {
+        initTraineeList();
+    }
     renderTop11();
 };
 
 function initTraineeList() {
     const listContainer = document.getElementById("trainee-list");
+    if (!listContainer) return;
     listContainer.innerHTML = "";
     trainees.forEach((trainee) => {
         const card = document.createElement("div");
@@ -142,18 +145,25 @@ function initTraineeList() {
     });
 }
 
+// 1. 중복 선택 알림 추가
 function selectTrainee(trainee) {
-    if (top11.includes(trainee)) return;
-    if (top11.length >= 11) return;
+    if (top11.includes(trainee)) {
+        alert("이미 선택된 연습생입니다.");
+        return;
+    }
+    if (top11.length >= 11) {
+        alert("최대 11명까지만 선택할 수 있습니다.");
+        return;
+    }
     top11.push(trainee);
     renderTop11();
 }
 
 function renderTop11() {
+    if (!top11Container) return;
     top11Container.innerHTML = "";
     const rows = [1, 2, 3, 5];
     let currentIdx = 0;
-
     rows.forEach((count) => {
         const rowDiv = document.createElement("div");
         rowDiv.className = "pyramid-row";
@@ -168,15 +178,9 @@ function renderTop11() {
                         <div class="rank-badge">${currentIdx + 1}</div>
                         <button class="remove-btn" onclick="event.stopPropagation(); removeTrainee(${currentIdx})">×</button>
                     </div>
-                    <p class="name">${trainee.name}</p>
-                `;
+                    <p class="name">${trainee.name}</p>`;
             } else {
-                slot.innerHTML = `
-                    <div class="image-container empty">
-                        <div class="rank-badge">${currentIdx + 1}</div>
-                    </div>
-                    <p class="name">-</p>
-                `;
+                slot.innerHTML = `<div class="image-container empty"><div class="rank-badge">${currentIdx + 1}</div></div><p class="name">-</p>`;
             }
             rowDiv.appendChild(slot);
             currentIdx++;
@@ -190,25 +194,55 @@ function removeTrainee(index) {
     renderTop11();
 }
 
-// ✅ 이미지 저장 시 삭제 버튼을 숨기는 기능 추가
-function saveAsImage() {
-    const target = document.getElementById("top11");
+// 2. ✅ 저장 기능 (로딩 대기 및 좌표 수정 버전)
+async function saveAsImage() {
+    const logoArea = document.querySelector('.logo-container');
+    const pyramidArea = document.querySelector('.top11-container');
+    const removeBtns = document.querySelectorAll('.remove-btn');
     
-    // 캡처 전 버튼 숨기기
-    const buttons = document.querySelectorAll('.remove-btn');
-    buttons.forEach(btn => btn.style.display = 'none');
+    removeBtns.forEach(btn => btn.style.display = 'none');
 
-    html2canvas(target, { 
-        scale: 2,
-        backgroundColor: "#ffffff",
-        useCORS: true 
-    }).then(canvas => {
-        // 캡처 후 버튼 다시 보이기
-        buttons.forEach(btn => btn.style.display = 'flex');
+    try {
+        // 🚀 이미지가 완전히 그려질 때까지 0.8초 대기
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        const options = { scale: 3, useCORS: true, logging: false, backgroundColor: "#ffffff" };
+        const logoCanvas = await html2canvas(logoArea, options);
+        const pyramidCanvas = await html2canvas(pyramidArea, options);
+
+        const finalCanvas = document.createElement('canvas');
+        const ctx = finalCanvas.getContext('2d');
+
+        // 로고 비율 및 하단 여백 설정
+        const logoHeight = logoCanvas.height * (pyramidCanvas.width / logoCanvas.width);
+        const footerHeight = 180; // 아이디가 잘리지 않게 여백 확대
+
+        finalCanvas.width = pyramidCanvas.width;
+        finalCanvas.height = logoHeight + pyramidCanvas.height + footerHeight;
+
+        // 배경색
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+        // 상단 로고 그리기
+        ctx.drawImage(logoCanvas, 0, 0, pyramidCanvas.width, logoHeight);
+
+        // 중앙 피라미드 그리기 (로고 바로 밑에 밀착)
+        ctx.drawImage(pyramidCanvas, 0, logoHeight);
+
+        // 하단 @itterashaiyade (검은색, 크기 확대)
+        ctx.fillStyle = "#000000";
+        ctx.font = "bold 44px HakgyoansimBareunDotum";
+        ctx.textAlign = "right";
+        ctx.fillText("@itterashaiyade", finalCanvas.width - 60, finalCanvas.height - 70);
 
         const link = document.createElement("a");
         link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
-        link.href = canvas.toDataURL();
+        link.href = finalCanvas.toDataURL("image/png", 1.0);
         link.click();
-    });
+    } catch (e) {
+        alert("이미지 저장에 실패했습니다. 사파리에서 '방문 기록 삭제' 후 다시 시도해 보세요!");
+    } finally {
+        removeBtns.forEach(btn => btn.style.display = 'flex');
+    }
 }
