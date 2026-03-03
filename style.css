@@ -17,51 +17,45 @@ body {
     overflow-x: hidden;
 }
 
-/* 2. 상단 로고 영역 (보내주신 이미지처럼 검정 배경) */
 .logo-container {
     background-color: #000;
-    padding: 25px 0;
-    margin-bottom: 0;
+    padding: 20px 0;
 }
 
 .main-logo {
-    width: 200px; /* 로고 크기 적절히 조절 */
+    width: 220px;
     height: auto;
-    display: block;
-    margin: 0 auto;
 }
 
-/* 3. 🔵 피라미드 영역 (가로 정렬 + 파란 테두리) */
 .top11-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 30px 10px;
-    background: #fff; /* 피라미드 배경은 깔끔하게 흰색 */
-    width: 100%;
+    background: #fff;
 }
 
 .pyramid-row {
-    display: flex;             /* 가로로 나란히 배치 */
-    justify-content: center;   /* 가운데로 모으기 */
-    gap: 12px;                 /* 사진 사이 간격 */
-    margin-bottom: 25px;       /* 층 사이 여유 공간 */
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 25px;
     width: 100%;
 }
 
 .top-card-slot {
-    width: 68px;               /* 아이폰 화면에 최적화된 크기 */
+    width: 65px;
     text-align: center;
+    position: relative; /* 버튼 배치를 위해 추가 */
 }
 
 .top-card-slot .image-container {
-    width: 62px;
-    height: 62px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
-    border: 3px solid #007bff; /* 참고 이미지의 파란색 굵은 테두리 */
+    border: 3px solid #007bff;
     position: relative;
     margin: 0 auto;
-    background: #eee;
 }
 
 .top-card-slot img {
@@ -71,77 +65,72 @@ body {
     object-fit: cover;
 }
 
-/* 순위 숫자 배지 (파란색 원) */
+/* ✅ '×' 버튼: 이름을 가리지 않도록 좌측 상단으로 이동 */
+.remove-btn {
+    position: absolute;
+    top: -5px;
+    left: -5px; /* right 대신 left 사용 */
+    background: rgba(255, 0, 0, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .rank-badge {
     position: absolute;
-    bottom: -6px;
+    bottom: -5px;
     left: 50%;
     transform: translateX(-50%);
     background: #007bff;
     color: white;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid #fff;
-    z-index: 2;
+    border: 1.5px solid #fff;
 }
 
-.top-card-slot .name {
-    font-size: 11px;
-    font-weight: bold;
-    margin-top: 10px;
-    color: #333;
-    white-space: nowrap;
-}
-
-/* 4. 🔽 하단 리스트 (아이폰 기준 3명씩 딱 맞게) */
 #trainee-list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 무조건 3열 고정 */
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     padding: 15px;
-    background-color: #f8f9fa;
 }
 
 .card {
     background: #fff;
-    border-radius: 15px;
-    padding: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    text-align: center;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .card img {
     width: 100%;
     aspect-ratio: 1 / 1;
-    border-radius: 12px;
+    border-radius: 10px;
     object-fit: cover;
 }
 
-.card .name-text {
-    font-size: 12px;
-    margin-top: 8px;
-    font-weight: 500;
-}
-
-/* 5. 저장 버튼 */
-.button-area {
-    padding: 20px 0;
-    background: #fff;
-}
-
 .save-btn {
-    background-color: #007bff;
-    color: white;
+    background: #007bff;
+    color: #fff;
     border: none;
-    padding: 14px 28px;
-    font-size: 16px;
+    padding: 12px 25px;
+    border-radius: 25px;
     font-weight: bold;
-    border-radius: 50px;
+    margin: 20px 0;
     cursor: pointer;
 }
