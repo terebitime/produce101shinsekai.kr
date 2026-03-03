@@ -21,3 +21,18 @@
   <script src="trainees.js"></script>
   <script src="script.js"></script>
 </body>
+<script src="trainees.js"></script>
+
+<script>
+  // trainees.js가 잘 로드되었는지 확인하는 테스트용 코드
+  window.onload = function() {
+    if (typeof trainees === 'undefined') {
+      console.error("❌ 에러: trainees.js 파일을 찾을 수 없거나 데이터가 없습니다.");
+      alert("데이터를 불러오지 못했습니다. 파일 이름을 확인해주세요!");
+    } else {
+      console.log("✅ 성공: " + trainees.length + "명의 연습생 데이터를 불러왔습니다.");
+    }
+  };
+</script>
+
+<script src="script.js"></script>
