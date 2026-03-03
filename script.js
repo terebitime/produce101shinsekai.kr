@@ -130,7 +130,6 @@ window.onload = function() {
     renderTop11();
 };
 
-// 연습생 리스트 생성
 function initTraineeList() {
     const listContainer = document.getElementById("trainee-list");
     if (!listContainer) return;
@@ -144,25 +143,20 @@ function initTraineeList() {
     });
 }
 
-// 연습생 선택 (중복 방지)
 function selectTrainee(trainee) {
     const isAlreadySelected = top11.some(item => item.name === trainee.name);
-    
     if (isAlreadySelected) {
         alert("이미 선택된 연습생입니다."); 
         return;
     }
-    
     if (top11.length >= 11) {
         alert("최대 11명까지만 선택할 수 있습니다.");
         return;
     }
-
     top11.push(trainee);
     renderTop11();
 }
 
-// 화면용 피라미드 렌더링
 function renderTop11() {
     if (!top11Container) return;
     top11Container.innerHTML = "";
@@ -193,47 +187,41 @@ function renderTop11() {
     });
 }
 
-// 선택 해제
 function removeTrainee(index) {
     top11.splice(index, 1);
     renderTop11();
 }
 
-// ✅ 이미지 저장 기능 (정사각형 및 학교안심 바른돋움 적용)
 async function saveAsImage() {
     const exportPyramid = document.getElementById("exportPyramid");
     const exportArea = document.getElementById("exportArea");
     
     if (top11.length === 0) {
-        alert("연습생을 한 명이라도 선택해 주세요!");
+        alert("연습생을 선택해 주세요!");
         return;
     }
 
-    // 저장용 영역 비우고 새로 생성
     exportPyramid.innerHTML = "";
-    
     const rows = [1, 2, 3, 5];
     let currentIdx = 0;
 
     rows.forEach(count => {
         const rowDiv = document.createElement("div");
         rowDiv.style.cssText = "display: flex; justify-content: center; gap: 35px; width: 100%;";
-        
         for (let i = 0; i < count; i++) {
             const trainee = top11[currentIdx];
             const slot = document.createElement("div");
             slot.style.cssText = "width: 125px; text-align: center;";
-            
             if (trainee) {
                 slot.innerHTML = `
-                    <div style="width: 120px; height: 120px; border-radius: 50%; border: 6px solid #0080ff; overflow: hidden; background: #fff; box-shadow: 0 8px 15px rgba(0,0,0,0.1); margin: 0 auto; position: relative;">
+                    <div style="width: 120px; height: 120px; border-radius: 50%; border: 6px solid #0080ff; overflow: hidden; background: #fff; margin: 0 auto; position: relative;">
                         <img src="${trainee.img}" style="width: 100%; height: 100%; object-fit: cover;">
                         <div style="position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); background: #0080ff; color: #fff; border-radius: 999px; font-weight: 900; font-size: 11px; padding: 4px 10px;">${currentIdx + 1}</div>
                     </div>
                     <div style="margin-top: 12px; font-size: 17px; font-weight: 900; color: #111;">${trainee.name}</div>
                 `;
             } else {
-                slot.innerHTML = `<div style="width: 120px; height: 120px; border-radius: 50%; background: #f0f0f0; opacity: 0.5; margin: 0 auto;"></div>`;
+                slot.innerHTML = `<div style="width: 120px; height: 120px; border-radius: 50%; background: #f0f0f0; margin: 0 auto;"></div>`;
             }
             rowDiv.appendChild(slot);
             currentIdx++;
@@ -242,26 +230,33 @@ async function saveAsImage() {
     });
 
     try {
-        // 폰트와 이미지가 렌더링될 시간을 줍니다.
-        await new Promise(resolve => setTimeout(resolve, 800));
+        // 폰트 로딩 대기
+        await document.fonts.ready;
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
         const canvas = await html2canvas(exportArea, {
             scale: 2, 
             useCORS: true,
             backgroundColor: "#ffffff",
-            width: 1000,   // 가로 1000px 고정
-            height: 1000,  // 세로 1000px 고정 (정사각형 핵심)
+            width: 1000,
+            height: 1000, // ★ 높이 1000px 강제 고정 (정사각형)
             windowWidth: 1000,
             windowHeight: 1000,
-            logging: false
+            x: 0,
+            y: 0,
+            scrollX: 0,
+            scrollY: 0
         });
 
         const link = document.createElement("a");
-        link.download = "SHINSEKAI_TOP11_PICK.png";
-        link.href = canvas.toDataURL("image/png", 1.0);
+        link.download = "SHINSEKAI_TOP11.png";
+        link.href = canvas.toDataURL("image/png");
         link.click();
     } catch (e) {
         alert("이미지 저장에 실패했습니다.");
+        console.error(e);
+    }
+}
         console.error(e);
     }
 }
