@@ -123,114 +123,57 @@ const trainees = [
 
 // (상단에 기존 trainees 데이터 배열을 유지하세요!)
 
-let top11 = [];
-const top11Container = document.getElementById("top11");
-
-window.onload = function() {
-    initTraineeList();
-    renderTop11();
-};
-
-function initTraineeList() {
-    const listContainer = document.getElementById("trainee-list");
-    listContainer.innerHTML = "";
-    trainees.forEach((trainee) => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `<img src="${trainee.img}"><p class="name-text">${trainee.name}</p>`;
-        card.onclick = () => selectTrainee(trainee);
-        listContainer.appendChild(card);
-    });
-}
-
-function selectTrainee(trainee) {
-    if (top11.includes(trainee)) return;
-    if (top11.length >= 11) return;
-    top11.push(trainee);
-    renderTop11();
-}
-
-function renderTop11() {
-    top11Container.innerHTML = "";
-    const rows = [1, 2, 3, 5];
-    let currentIdx = 0;
-
-    rows.forEach((count) => {
-        const rowDiv = document.createElement("div");
-        rowDiv.className = "pyramid-row";
-        for (let i = 0; i < count; i++) {
-            const trainee = top11[currentIdx];
-            const slot = document.createElement("div");
-            slot.className = "top-card-slot";
-            if (trainee) {
-                slot.innerHTML = `
-                    <div class="image-container">
-                        <img src="${trainee.img}">
-                        <div class="rank-badge">${currentIdx + 1}</div>
-                        <button class="remove-btn" onclick="event.stopPropagation(); removeTrainee(${currentIdx})">×</button>
-                    </div>
-                    <p class="name">${trainee.name}</p>
-                `;
-            } else {
-                slot.innerHTML = `<div class="image-container empty"><div class="rank-badge">${currentIdx + 1}</div></div><p class="name">-</p>`;
-            }
-            rowDiv.appendChild(slot);
-            currentIdx++;
-        }
-        top11Container.appendChild(rowDiv);
-    });
-}
-
-function removeTrainee(index) {
-    top11.splice(index, 1);
-    renderTop11();
-}
-
-// ✅ 저장 기능: 하단에 itterashaiyade 아이디만 표시
 async function saveAsImage() {
-    const target = document.getElementById("top11");
+    // 1. 캡처할 영역 설정 (로고 + 피라미드 전체를 포함하기 위해 상위 컨테이너 생성)
+    const logoArea = document.querySelector('.logo-container');
+    const pyramidArea = document.querySelector('.top11-container');
     
-    // 1. 캡처 전 삭제 버튼(×) 숨기기
-    const buttons = document.querySelectorAll('.remove-btn');
-    buttons.forEach(btn => btn.style.display = 'none');
+    // 삭제 버튼 잠시 숨기기
+    const removeBtns = document.querySelectorAll('.remove-btn');
+    removeBtns.forEach(btn => btn.style.display = 'none');
 
-    // 2. html2canvas로 피라미드 영역 캡처
-    html2canvas(target, { 
-        scale: 3, // 고해상도 설정
-        backgroundColor: "#ffffff",
-        useCORS: true 
-    }).then(canvas => {
-        const width = canvas.width;
-        const height = canvas.height;
+    // 2. 전체 캔버스 캡처 (로고 + 피라미드 합치기)
+    // 팁: 두 영역을 각각 캡처해서 하나로 합치는 방식이 가장 깔끔합니다.
+    const logoCanvas = await html2canvas(logoArea, { scale: 2 });
+    const pyramidCanvas = await html2canvas(pyramidArea, { scale: 2, backgroundColor: "#ffffff" });
 
-        // 3. 하단 여백을 포함한 최종 캔버스 생성
-        const finalCanvas = document.createElement('canvas');
-        finalCanvas.width = width;
-        finalCanvas.height = height + 120; // 아이디가 들어갈 공간 확보
-        const finalCtx = finalCanvas.getContext('2d');
+    const finalCanvas = document.createElement('canvas');
+    const ctx = finalCanvas.getContext('2d');
 
-        // 배경색 채우기 (흰색)
-        finalCtx.fillStyle = "#ffffff";
-        finalCtx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+    // 최종 이미지 크기 설정 (로고 높이 + 피라미드 높이 + 하단 문구 공간)
+    finalCanvas.width = pyramidCanvas.width;
+    finalCanvas.height = logoCanvas.height * (pyramidCanvas.width / logoCanvas.width) + pyramidCanvas.height + 150;
 
-        // 원본 피라미드 이미지 그리기
-        finalCtx.drawImage(canvas, 0, 0);
+    // 배경 흰색 채우기
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
 
-        // 4. 요청하신 아이디(itterashaiyade) 추가
-        finalCtx.fillStyle = "#aaaaaa"; // 연한 회색으로 저작권 느낌 강조
-        finalCtx.font = "bold 36px HakgyoansimBareunDotum";
-        finalCtx.textAlign = "right"; // 우측 정렬
-        
-        // 이미지 우측 하단에 배치
-        finalCtx.fillText("@itterashaiyade", width - 50, height + 70);
+    // [상단] 홈페이지 로고 그리기
+    const logoHeight = logoCanvas.height * (pyramidCanvas.width / logoCanvas.width);
+    ctx.drawImage(logoCanvas, 0, 0, pyramidCanvas.width, logoHeight);
 
-        // 5. 이미지 파일로 다운로드
-        const link = document.createElement("a");
-        link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
-        link.href = finalCanvas.toDataURL("image/png");
-        link.click();
+    // [중앙] 피라미드 이미지 그리기
+    ctx.drawImage(pyramidCanvas, 0, logoHeight);
 
-        // 6. 캡처 완료 후 삭제 버튼 다시 표시
-        buttons.forEach(btn => btn.style.display = 'flex');
-    });
+    // [하단] @itterashaiyade 텍스트 추가
+    ctx.fillStyle = "#000000"; // 검은색 폰트 요청 반영
+    ctx.font = "bold 32px HakgyoansimBareunDotum"; // 학교안심 바른돋움체
+    ctx.textAlign = "right";
+    
+    // 이미지 오른쪽 하단 여백에 배치
+    ctx.fillText("@itterashaiyade", finalCanvas.width - 50, finalCanvas.height - 60);
+
+    // 3. 파일 다운로드
+    const link = document.createElement("a");
+    link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
+    link.href = finalCanvas.toDataURL("image/png");
+    link.click();
+
+    // 삭제 버튼 다시 보이게 복구
+    removeBtns.forEach(btn => btn.style.display = 'flex');
 }
+
+/* 6. 리스트 영역 */
+#trainee-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
+.card { background: #fff; border-radius: 12px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.card img { width: 100%; aspect-ratio: 1 / 1; border-radius: 10px; object-fit: cover; }
