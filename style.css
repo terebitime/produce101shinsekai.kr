@@ -3,34 +3,50 @@
     src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2403-2@1.0/HakgyoansimBareunDotumR.woff2') format('woff2');
 }
 
-* {
-    font-family: 'HakgyoansimBareunDotum', sans-serif !important;
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
+/* 1. 기본 여백 완전히 제거 */
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
     background-color: #f8f9fa;
     text-align: center;
     overflow-x: hidden;
+    font-family: 'HakgyoansimBareunDotum', sans-serif !important;
 }
 
-/* 1. 상단 로고 영역 - 크기 대폭 확대 */
+/* 2. 상단 로고 영역 - 여백 0 및 빈틈 제거 */
 .logo-container {
-    background-color: #000;
-    padding: 10px 0; /* 위아래 여백을 줄여 로고가 더 꽉 차게 */
+    background-color: #000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    line-height: 0 !important; /* 이미지 아래 미세 틈 제거 */
+    display: block !important;
 }
 
 .main-logo {
-    width: 100%;       /* 화면 너비에 맞게 꽉 채움 */
-    max-width: 500px;  /* 너무 커지는 것 방지 (아이폰 Pro Max 기준) */
-    height: auto;
-    display: block;
-    margin: 0 auto;
+    width: 100% !important;
+    max-width: 600px !important;
+    height: auto !important;
+    display: block !important;
+    margin: 0 auto !important;
+    border: none !important;
 }
 
-/* 2. 피라미드 영역 */
+/* 3. 저장하기 버튼 - 선명한 파란색으로 강제 고정 */
+.save-btn {
+    background-color: #007bff !important; /* 선명한 파란색 */
+    color: #ffffff !important;
+    border: none !important;
+    padding: 14px 28px !important;
+    border-radius: 30px !important; /* 둥근 버튼 스타일 */
+    font-size: 16px !important;
+    font-weight: bold !important;
+    margin: 25px 0 !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3) !important;
+    display: inline-block !important;
+}
+
+/* 4. 피라미드 및 기타 레이아웃 유지 */
 .top11-container {
     display: flex;
     flex-direction: column;
@@ -47,115 +63,28 @@ body {
     width: 100%;
 }
 
-.top-card-slot {
-    width: 65px;
-    text-align: center;
-    position: relative;
-}
-
+.top-card-slot { width: 65px; text-align: center; position: relative; }
 .top-card-slot .image-container {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: 3px solid #007bff;
-    position: relative;
-    margin: 0 auto;
+    width: 60px; height: 60px; border-radius: 50%;
+    border: 3px solid #007bff; position: relative; margin: 0 auto;
 }
+.top-card-slot img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 
-.top-card-slot img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-/* 삭제 버튼: 좌측 상단 */
 .remove-btn {
-    position: absolute;
-    top: -5px;
-    left: -5px;
-    background: rgba(255, 0, 0, 0.8);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    font-size: 12px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: absolute; top: -5px; left: -5px;
+    background: rgba(255, 0, 0, 0.8); color: white;
+    border: none; border-radius: 50%; width: 20px; height: 20px;
+    font-size: 12px; font-weight: bold; cursor: pointer; z-index: 10;
+    display: flex; align-items: center; justify-content: center;
 }
 
 .rank-badge {
-    position: absolute;
-    bottom: -5px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #007bff;
-    color: white;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    font-size: 10px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1.5px solid #fff;
+    position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
+    background: #007bff; color: white; width: 18px; height: 18px;
+    border-radius: 50%; font-size: 10px; font-weight: bold;
+    display: flex; align-items: center; justify-content: center; border: 1.5px solid #fff;
 }
 
-/* 3. 하단 리스트 영역 */
-#trainee-list {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    padding: 15px;
-}
-
-.card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.card img {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    }
-
-    /* 하단 정보 (저장 시에만 표시되게 할 수도 있음) */
-.footer-info {
-    margin-top: 30px;
-    font-size: 12px;
-    color: #888;
-    display: none; /* 평소엔 숨김 */
-}
-
-/* 상단 여백을 완전히 없애기 위한 설정 */
-body {
-    background-color: #f8f9fa;
-    text-align: center;
-    overflow-x: hidden;
-    margin: 0; /* 브라우저 기본 마진 제거 */
-    padding: 0;
-}
-
-/* 1. 상단 로고 영역 - 위쪽 여백 0으로 설정 */
-.logo-container {
-    background-color: #000;
-    padding: 0;        /* 위아래 여백을 0으로 만듦 */
-    margin: 0;         /* 혹시 모를 마진도 0으로 설정 */
-    line-height: 0;    /* 이미지 하단 미세 여백 제거 */
-}
-
-.main-logo {
-    width: 100%;       
-    max-width: 600px;  
-    height: auto;
-    display: block;    /* 인라인 요소 여백 방지 */
-    margin: 0 auto;    /* 좌우 중앙 정렬만 유지 */
-}
+#trainee-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
+.card { background: #fff; border-radius: 12px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.card img { width: 100%; aspect-ratio: 1 / 1; border-radius: 10px; object-fit: cover; }
