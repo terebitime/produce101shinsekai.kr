@@ -16,16 +16,21 @@ body {
     overflow-x: hidden;
 }
 
+/* 1. 상단 로고 영역 - 크기 대폭 확대 */
 .logo-container {
     background-color: #000;
-    padding: 20px 0;
+    padding: 10px 0; /* 위아래 여백을 줄여 로고가 더 꽉 차게 */
 }
 
 .main-logo {
-    width: 220px;
+    width: 100%;       /* 화면 너비에 맞게 꽉 채움 */
+    max-width: 500px;  /* 너무 커지는 것 방지 (아이폰 Pro Max 기준) */
     height: auto;
+    display: block;
+    margin: 0 auto;
 }
 
+/* 2. 피라미드 영역 */
 .top11-container {
     display: flex;
     flex-direction: column;
@@ -45,7 +50,7 @@ body {
 .top-card-slot {
     width: 65px;
     text-align: center;
-    position: relative; /* 버튼 배치를 위해 추가 */
+    position: relative;
 }
 
 .top-card-slot .image-container {
@@ -64,11 +69,11 @@ body {
     object-fit: cover;
 }
 
-/* ✅ '×' 버튼: 이름을 가리지 않도록 좌측 상단으로 이동 */
+/* 삭제 버튼: 좌측 상단 */
 .remove-btn {
     position: absolute;
     top: -5px;
-    left: -5px; /* right 대신 left 사용 */
+    left: -5px;
     background: rgba(255, 0, 0, 0.8);
     color: white;
     border: none;
@@ -102,6 +107,7 @@ body {
     border: 1.5px solid #fff;
 }
 
+/* 3. 하단 리스트 영역 */
 #trainee-list {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -119,17 +125,12 @@ body {
 .card img {
     width: 100%;
     aspect-ratio: 1 / 1;
-    border-radius: 10px;
-    object-fit: cover;
-}
+    }
 
-.save-btn {
-    background: #007bff;
-    color: #fff;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 25px;
-    font-weight: bold;
-    margin: 20px 0;
-    cursor: pointer;
+    /* 하단 정보 (저장 시에만 표시되게 할 수도 있음) */
+.footer-info {
+    margin-top: 30px;
+    font-size: 12px;
+    color: #888;
+    display: none; /* 평소엔 숨김 */
 }
