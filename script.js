@@ -1,3 +1,7 @@
+// script.js 맨 위쪽 어딘가에 이 줄이 꼭 있어야 합니다!
+const top11Container = document.getElementById("top11");
+const traineeListContainer = document.getElementById("trainee-list");
+let top11 = []; // 선택된 연습생을 담을 배열
 function renderTop11() {
   top11Container.innerHTML = ""; // 기존 내용 초기화
 
@@ -70,3 +74,12 @@ function saveAsImage() {
         link.click();
     });
 }
+
+// 페이지가 로드되면 실행되는 부분
+window.onload = function() {
+    // 1. 전체 연습생 리스트 그리기 (기존에 만드신 함수 이름이 init이라면 init())
+    init(); 
+    
+    // 2. 빈 피라미드 그리기
+    renderTop11();
+};
