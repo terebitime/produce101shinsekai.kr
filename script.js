@@ -125,43 +125,35 @@ const trainees = [
 let top11 = [];
 const top11Container = document.getElementById("top11");
 
-// 2. 페이지 로드 시 초기화
 window.onload = function() {
     if (typeof trainees !== 'undefined') {
         initTraineeList();
-    } else {
-        console.error("trainees 데이터가 정의되지 않았습니다. trainees.js 파일을 확인해주세요.");
     }
     renderTop11();
 };
 
-// 3. 연습생 리스트 생성
 function initTraineeList() {
     const listContainer = document.getElementById("trainee-list");
     if (!listContainer) return;
-    
     listContainer.innerHTML = "";
     trainees.forEach((trainee) => {
         const card = document.createElement("div");
         card.className = "card";
-        card.innerHTML = `
-            <img src="${trainee.img}" alt="${trainee.name}">
-            <p class="name-text">${trainee.name}</p>
-        `;
+        card.innerHTML = `<img src="${trainee.img}"><p class="name-text">${trainee.name}</p>`;
         card.onclick = () => selectTrainee(trainee);
         listContainer.appendChild(card);
     });
 }
 
-// 4. 연습생 선택 로직 (중복 알림 포함)
+// ✅ 1. 중복 알림 수정: 이름(name)을 직접 비교하여 확실하게 띄우기
 function selectTrainee(trainee) {
-    // 이미 선택된 경우
-    if (top11.includes(trainee)) {
-        alert("이미 선택된 연습생입니다.");
+    const isAlreadySelected = top11.some(item => item.name === trainee.name);
+    
+    if (isAlreadySelected) {
+        alert("이미 선택된 연습생입니다."); 
         return;
     }
     
-    // 11명이 꽉 찬 경우
     if (top11.length >= 11) {
         alert("최대 11명까지만 선택할 수 있습니다.");
         return;
@@ -171,23 +163,18 @@ function selectTrainee(trainee) {
     renderTop11();
 }
 
-// 5. 피라미드 렌더링 (간격 및 비율 최적화)
 function renderTop11() {
     if (!top11Container) return;
     top11Container.innerHTML = "";
-    
-    const rows = [1, 2, 3, 5]; // 피라미드 층별 인원
+    const rows = [1, 2, 3, 5];
     let currentIdx = 0;
-
     rows.forEach((count) => {
         const rowDiv = document.createElement("div");
         rowDiv.className = "pyramid-row";
-        
         for (let i = 0; i < count; i++) {
             const trainee = top11[currentIdx];
             const slot = document.createElement("div");
             slot.className = "top-card-slot";
-            
             if (trainee) {
                 slot.innerHTML = `
                     <div class="image-container">
@@ -195,15 +182,9 @@ function renderTop11() {
                         <div class="rank-badge">${currentIdx + 1}</div>
                         <button class="remove-btn" onclick="event.stopPropagation(); removeTrainee(${currentIdx})">×</button>
                     </div>
-                    <p class="name">${trainee.name}</p>
-                `;
+                    <p class="name">${trainee.name}</p>`;
             } else {
-                slot.innerHTML = `
-                    <div class="image-container empty">
-                        <div class="rank-badge">${currentIdx + 1}</div>
-                    </div>
-                    <p class="name">-</p>
-                `;
+                slot.innerHTML = `<div class="image-container empty"><div class="rank-badge">${currentIdx + 1}</div></div><p class="name">-</p>`;
             }
             rowDiv.appendChild(slot);
             currentIdx++;
@@ -212,24 +193,21 @@ function renderTop11() {
     });
 }
 
-// 6. 연습생 삭제
 function removeTrainee(index) {
     top11.splice(index, 1);
     renderTop11();
 }
 
-// ✅ 7. 이미지 저장 (사이즈 고정 + 아이디 위치 최적화)
+// ✅ 2. 저장 기능: 사이즈 800px 고정 및 하단 여백 최적화
 async function saveAsImage() {
     const logoArea = document.querySelector('.logo-container');
     const pyramidArea = document.querySelector('.top11-container');
     const removeBtns = document.querySelectorAll('.remove-btn');
     
-    if (!logoArea || !pyramidArea) return;
-
     removeBtns.forEach(btn => btn.style.display = 'none');
 
     try {
-        // 로딩 대기 (이미지 누락 방지)
+        // 이미지 로딩 대기 시간 (1초)
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         const options = { 
@@ -245,42 +223,38 @@ async function saveAsImage() {
         const finalCanvas = document.createElement('canvas');
         const ctx = finalCanvas.getContext('2d');
 
-        // ✅ 결과물 가로 크기를 800px로 표준화 (사이즈 들쭉날쭉 방지)
+        // 🚀 결과물 가로 크기를 800px로 표준화 (기기별 사이즈 차이 해결)
         const standardWidth = 800;
-        
-        // 로고 비율 재계산
         const logoHeight = logoCanvas.height * (standardWidth / logoCanvas.width);
-        // 피라미드 영역 비율 재계산
         const pyramidHeight = pyramidCanvas.height * (standardWidth / pyramidCanvas.width);
-        const footerHeight = 100; // 하단 아이디 영역
+        const footerHeight = 120; // 하단 아이디 영역 확보
 
         finalCanvas.width = standardWidth;
         finalCanvas.height = logoHeight + pyramidHeight + footerHeight;
 
-        // 배경색 채우기
+        // 전체 배경 흰색
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
 
-        // 1. 상단 로고 그리기 (정해진 너비에 맞춤)
+        // 상단 로고
         ctx.drawImage(logoCanvas, 0, 0, standardWidth, logoHeight);
 
-        // 2. 중앙 피라미드 그리기 (로고 바로 아래 밀착)
+        // 중앙 피라미드
         ctx.drawImage(pyramidCanvas, 0, logoHeight, standardWidth, pyramidHeight);
 
-        // 3. 하단 @itterashaiyade (위치 및 크기 고정)
-        ctx.fillStyle = "#333333";
-        ctx.font = "bold 24px sans-serif"; 
+        // 하단 @itterashaiyade (검은색 고정)
+        ctx.fillStyle = "#000000";
+        ctx.font = "bold 28px sans-serif"; 
         ctx.textAlign = "right";
         ctx.fillText("@itterashaiyade", finalCanvas.width - 40, finalCanvas.height - 40);
 
-        // 저장 실행
         const link = document.createElement("a");
         link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
-        link.href = finalCanvas.toDataURL("image/png", 0.9);
+        link.href = finalCanvas.toDataURL("image/png", 1.0);
         link.click();
         
     } catch (e) {
-        alert("저장에 실패했습니다. 사파리 방문 기록 삭제 후 다시 시도해 보세요!");
+        alert("이미지 저장에 실패했습니다.");
     } finally {
         removeBtns.forEach(btn => btn.style.display = 'flex');
     }
