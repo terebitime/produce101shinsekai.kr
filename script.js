@@ -226,51 +226,64 @@ async function saveAsImage() {
     
     if (!logoArea || !pyramidArea) return;
 
-    // 삭제 버튼 일시 숨김
+    // 1. 저장 전 삭제 버튼 숨기기
     removeBtns.forEach(btn => btn.style.display = 'none');
 
     try {
-        const options = { scale: 3, useCORS: true, backgroundColor: "#ffffff" };
+        // 🚀 중요: 로고 이미지가 캔버스에 그려질 시간을 확보 (1초 대기)
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        const options = { 
+            scale: 2, // 해상도 조절 (너무 크면 용량이 커지므로 2가 적당합니다)
+            useCORS: true, 
+            backgroundColor: "#ffffff",
+            logging: false
+        };
+
+        // 2. 각 영역을 캔버스로 변환
         const logoCanvas = await html2canvas(logoArea, options);
         const pyramidCanvas = await html2canvas(pyramidArea, options);
 
+        // 3. 최종 통합 캔버스 생성
         const finalCanvas = document.createElement('canvas');
         const ctx = finalCanvas.getContext('2d');
 
-        // 로고 비율 및 여백 계산
-        const logoHeight = logoCanvas.height * (pyramidCanvas.width / logoCanvas.width);
-        const footerHeight = 150; 
+        // 가로 길이는 피라미드 영역에 맞춥니다
+        const targetWidth = pyramidCanvas.width;
+        // 로고 비율에 맞춘 높이 계산
+        const logoHeight = logoCanvas.height * (targetWidth / logoCanvas.width);
+        const footerHeight = 120; // 아이디가 들어갈 여백
 
-        finalCanvas.width = pyramidCanvas.width;
+        finalCanvas.width = targetWidth;
         finalCanvas.height = logoHeight + pyramidCanvas.height + footerHeight;
 
-        // 배경색 채우기
+        // 4. 배경색 및 이미지 합성
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
 
-        // 상단 로고 그리기
-        ctx.drawImage(logoCanvas, 0, 0, pyramidCanvas.width, logoHeight);
+        // [상단] 로고 그리기 (가로 폭에 맞게 리사이징)
+        ctx.drawImage(logoCanvas, 0, 0, targetWidth, logoHeight);
 
-        // 중앙 피라미드 그리기
+        // [중앙] 피라미드 그리기 (로고 바로 아래 배치)
         ctx.drawImage(pyramidCanvas, 0, logoHeight);
 
-        // 하단 @itterashaiyade (검은색, 학교안심 바른돋움)
+        // 5. [하단] @itterashaiyade (검은색, 우측 정렬)
         ctx.fillStyle = "#000000";
-        ctx.font = "bold 40px HakgyoansimBareunDotum";
+        ctx.font = "bold 32px HakgyoansimBareunDotum, sans-serif"; 
         ctx.textAlign = "right";
-        ctx.fillText("@itterashaiyade", finalCanvas.width - 60, finalCanvas.height - 60);
+        ctx.fillText("@itterashaiyade", finalCanvas.width - 40, finalCanvas.height - 50);
 
-        // 다운로드 실행
+        // 6. 다운로드 실행
         const link = document.createElement("a");
         link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
-        link.href = finalCanvas.toDataURL("image/png");
+        link.href = finalCanvas.toDataURL("image/png", 1.0);
         link.click();
         
     } catch (e) {
-        console.error(e);
-        alert("이미지 저장 중 오류가 발생했습니다.");
+        console.error("저장 오류:", e);
+        alert("이미지 생성에 실패했습니다. 사파리 '방문 기록 삭제' 후 다시 시도해 주세요.");
     } finally {
-        // 삭제 버튼 복구
+        // 7. 삭제 버튼 복구
         removeBtns.forEach(btn => btn.style.display = 'flex');
     }
 }
