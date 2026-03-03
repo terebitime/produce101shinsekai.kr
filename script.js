@@ -191,7 +191,7 @@ function removeTrainee(index) {
     renderTop11();
 }
 
-// ✅ 이미지 저장 함수 최적화
+// ✅ 이미지 저장 함수 최적화 (정사각형 고정 및 로고 잘림 방지)
 async function saveAsImage() {
     const exportPyramid = document.getElementById("exportPyramid");
     const exportArea = document.getElementById("exportArea");
@@ -201,14 +201,14 @@ async function saveAsImage() {
         return;
     }
 
-    // 저장용 피라미드 생성
+    // 저장용 피라미드 생성 (실제 화면과 좌표 동일하게)
     exportPyramid.innerHTML = "";
     const rows = [1, 2, 3, 5];
     let currentIdx = 0;
 
     rows.forEach(count => {
         const rowDiv = document.createElement("div");
-        rowDiv.style.cssText = "display: flex; justify-content: center; gap: 20px; width: 100%; margin-bottom: 10px;";
+        rowDiv.style.cssText = "display: flex; justify-content: center; gap: 20px; width: 100%; margin-bottom: 5px;";
         for (let i = 0; i < count; i++) {
             const trainee = top11[currentIdx];
             const slot = document.createElement("div");
@@ -222,13 +222,7 @@ async function saveAsImage() {
                     <div style="margin-top: 8px; font-size: 16px; font-weight: 900; color: #111;">${trainee.name}</div>
                 `;
             } else {
-                // 비어있는 슬롯도 깔끔하게 유지
-                slot.innerHTML = `
-                    <div style="width: 110px; height: 110px; border-radius: 50%; background: #f4f4f4; margin: 0 auto; position: relative; border: 5px solid #eee;">
-                        <div style="position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); background: #ccc; color: #fff; border-radius: 999px; font-weight: 900; font-size: 11px; padding: 3px 8px;">${currentIdx + 1}</div>
-                    </div>
-                    <div style="margin-top: 8px; font-size: 16px; font-weight: 900; color: #ccc;">-</div>
-                `;
+                slot.innerHTML = `<div style="width: 110px; height: 110px; border-radius: 50%; background: #f4f4f4; margin: 0 auto;"></div>`;
             }
             rowDiv.appendChild(slot);
             currentIdx++;
@@ -237,37 +231,32 @@ async function saveAsImage() {
     });
 
     try {
+        // 폰트 대기 (저장 시 돋움체 계열 강제)
         await document.fonts.ready;
         await new Promise(resolve => setTimeout(resolve, 1200));
 
+        // html2canvas 설정: 기기별 창 크기 무시하고 무조건 1000x1000 가상 화면 구성
         const canvas = await html2canvas(exportArea, {
             scale: 2, 
             useCORS: true,
             backgroundColor: "#ffffff",
             width: 1000,
             height: 1000,
-            windowWidth: 1000,
-            windowHeight: 1000,
+            windowWidth: 1000, // ★ 가상 창 너비 강제 고정
+            windowHeight: 1000, // ★ 가상 창 높이 강제 고정
             x: 0,
             y: 0,
             scrollX: 0,
             scrollY: 0,
-            onclone: (clonedDoc) => {
-                // 중요: 복제된 문서에서 캡처 영역을 보이게 처리
-                const target = clonedDoc.getElementById("exportArea");
-                if (target) {
-                    target.style.position = "static";
-                    target.style.visibility = "visible";
-                }
-            }
+            logging: false
         });
 
         const link = document.createElement("a");
-        link.download = `TOP11_PICK_${new Date().getTime()}.png`;
+        link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
         link.href = canvas.toDataURL("image/png", 1.0);
         link.click();
     } catch (e) {
-        alert("이미지 저장에 실패했습니다. 다시 시도해 주세요.");
+        alert("이미지 저장에 실패했습니다.");
         console.error(e);
     }
 }
