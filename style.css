@@ -1,12 +1,9 @@
-/* 1. 웹폰트 불러오기 */
+/* 1. 웹폰트 설정 */
 @font-face {
     font-family: 'HakgyoansimBareunDotum';
     src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2403-2@1.0/HakgyoansimBareunDotumR.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
 }
 
-/* 2. 전체 적용 (중요: Noto Sans 설정을 지우고 이걸로 통일) */
 * {
     font-family: 'HakgyoansimBareunDotum', sans-serif !important;
     box-sizing: border-box;
@@ -16,96 +13,135 @@
 
 body {
     background-color: #f8f9fa;
-    text-align: center; /* 텍스트 중앙 정렬 */
-    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    overflow-x: hidden;
 }
 
-h1 { 
-    margin: 40px 0 20px 0; 
-    font-weight: 700;
-    color: #222;
+/* 2. 상단 로고 영역 (보내주신 이미지처럼 검정 배경) */
+.logo-container {
+    background-color: #000;
+    padding: 25px 0;
+    margin-bottom: 0;
 }
 
-/* 3. 연습생 리스트 그리드 */
-#trainee-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
-    gap: 20px;
-    padding: 20px;
-    max-width: 1100px;
+.main-logo {
+    width: 200px; /* 로고 크기 적절히 조절 */
+    height: auto;
+    display: block;
     margin: 0 auto;
 }
 
-/* 4. 연습생 카드 스타일 */
+/* 3. 🔵 피라미드 영역 (가로 정렬 + 파란 테두리) */
+.top11-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 10px;
+    background: #fff; /* 피라미드 배경은 깔끔하게 흰색 */
+    width: 100%;
+}
+
+.pyramid-row {
+    display: flex;             /* 가로로 나란히 배치 */
+    justify-content: center;   /* 가운데로 모으기 */
+    gap: 12px;                 /* 사진 사이 간격 */
+    margin-bottom: 25px;       /* 층 사이 여유 공간 */
+    width: 100%;
+}
+
+.top-card-slot {
+    width: 68px;               /* 아이폰 화면에 최적화된 크기 */
+    text-align: center;
+}
+
+.top-card-slot .image-container {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    border: 3px solid #007bff; /* 참고 이미지의 파란색 굵은 테두리 */
+    position: relative;
+    margin: 0 auto;
+    background: #eee;
+}
+
+.top-card-slot img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* 순위 숫자 배지 (파란색 원) */
+.rank-badge {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #007bff;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+    z-index: 2;
+}
+
+.top-card-slot .name {
+    font-size: 11px;
+    font-weight: bold;
+    margin-top: 10px;
+    color: #333;
+    white-space: nowrap;
+}
+
+/* 4. 🔽 하단 리스트 (아이폰 기준 3명씩 딱 맞게) */
+#trainee-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 무조건 3열 고정 */
+    gap: 10px;
+    padding: 15px;
+    background-color: #f8f9fa;
+}
+
 .card {
     background: #fff;
     border-radius: 15px;
-    padding: 15px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    transition: all 0.2s ease-in-out;
-    cursor: pointer;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0, 123, 255, 0.2);
+    padding: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    text-align: center;
 }
 
 .card img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
     object-fit: cover;
-    margin-bottom: 8px;
-    transition: 0.3s;
-}
-
-.card:hover img {
-    transform: scale(1.1);
-    border: 3px solid #007bff;
 }
 
 .card .name-text {
-    font-size: 14px;
+    font-size: 12px;
+    margin-top: 8px;
     font-weight: 500;
-    color: #333;
-    margin-top: 5px;
 }
 
-/* 5. 버튼 스타일 */
+/* 5. 저장 버튼 */
 .button-area {
-    display: flex;
-    justify-content: center;
-    margin: 30px 0;
+    padding: 20px 0;
+    background: #fff;
 }
 
 .save-btn {
     background-color: #007bff;
     color: white;
     border: none;
-    padding: 15px 30px;
-    font-size: 18px;
+    padding: 14px 28px;
+    font-size: 16px;
     font-weight: bold;
     border-radius: 50px;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
-    transition: 0.3s;
-}
-
-.save-btn:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
-}
-
-/* 6. 피라미드 및 기타 레이아웃 */
-.image-container.empty {
-    background-color: #f0f0f0;
-    border: 2px dashed #ccc;
-    border-radius: 50%; /* 빈 원형 유지 */
-    width: 80px;
-    height: 80px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
