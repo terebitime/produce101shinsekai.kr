@@ -8,16 +8,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
-        /* 학교안심 바른돋움 폰트 강제 로드 */
+        /* 학교안심 바른돋움 폰트 로드 */
         @font-face {
             font-family: 'HakgyoansimBareunDotum';
             src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2310@1.0/HakgyoansimBareunDotumR.woff2') format('woff2');
-            font-weight: normal;
-            font-style: normal;
-            font-display: block;
+            font-display: swap;
         }
 
-        /* 저장 영역의 모든 텍스트에 폰트 강제 적용 */
+        /* 저장 영역 내 텍스트 폰트 강제 */
         #exportArea * {
             font-family: 'HakgyoansimBareunDotum', sans-serif !important;
         }
@@ -38,30 +36,25 @@
 
     <script src="trainees.js"></script>
     <script src="script.js"></script>
-    <script src="trainees.js"></script>
-    <script src="script.js"></script>
 
-   <div id="exportArea" style="position: fixed; left: -9999px; top: 0; width: 1000px !important; height: 1000px !important; background: #ffffff; padding: 0; margin: 0; overflow: hidden; z-index: -1;">
-    <div id="exportInner" style="width: 1000px !important; height: 1000px !important; background: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 40px 0; box-sizing: border-box;">
-        
-        <div style="text-align: center; width: 100%;">
-            <img src="image/header--logo_clean.jpg" style="width: 500px; display: block; margin: 0 auto;">
-            <div style="margin-top: 10px; font-weight: 900; letter-spacing: .06em; font-size: 22px; color: #111;">
-                AUDITION PICK • YOUR TOP 11
+    <div id="exportArea" style="position: fixed; left: -9999px; top: 0; width: 1000px !important; height: 1000px !important; background: #ffffff; padding: 0; margin: 0; overflow: hidden; z-index: -1;">
+        <div id="exportInner" style="width: 1000px !important; height: 1000px !important; background: #ffffff; display: flex; flex-direction: column; align-items: center; padding: 40px 0 20px 0; box-sizing: border-box; overflow: hidden;">
+            
+            <div style="text-align: center; width: 100%; height: 200px; flex-shrink: 0;">
+                <img src="image/header--logo_clean.jpg" style="width: 480px; display: block; margin: 0 auto;">
+                <div style="margin-top: 10px; font-weight: 900; letter-spacing: .06em; font-size: 22px; color: #111;">
+                    AUDITION PICK • YOUR TOP 11
+                </div>
+            </div>
+
+            <div id="exportPyramid" style="display: flex; flex-direction: column; gap: 15px; align-items: center; justify-content: center; width: 100%; flex-grow: 1;"></div>
+
+            <div style="width: 100%; text-align: center; height: 50px; flex-shrink: 0; margin-top: 10px;">
+                <span style="font-family: 'HakgyoansimBareunDotum', sans-serif !important; font-size: 18px; color: #888888 !important; font-weight: 500;">
+                    @itterashaiyade
+                </span>
             </div>
         </div>
-
-        <div id="exportPyramid" style="display: flex; flex-direction: column; gap: 15px; align-items: center; justify-content: center; width: 100%; flex-grow: 1;"></div>
-
-        <div style="width: 100%; text-align: center; padding-bottom: 10px;">
-            <span style="font-family: 'HakgyoansimBareunDotum', sans-serif !important; font-size: 18px; color: #888888 !important; font-weight: 500;">
-                @itterashaiyade
-            </span>
-        </div>
     </div>
-</div>
-    </body>
-</html>
-
 </body>
 </html>
