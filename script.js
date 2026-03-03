@@ -191,7 +191,6 @@ function removeTrainee(index) {
     renderTop11();
 }
 
-// ✅ 이미지 저장 함수 (정사각형 고정 최종본)
 async function saveAsImage() {
     const exportPyramid = document.getElementById("exportPyramid");
     const exportArea = document.getElementById("exportArea");
@@ -230,30 +229,21 @@ async function saveAsImage() {
     });
 
     try {
-        // 폰트 및 리소스 대기
         await document.fonts.ready;
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 1200));
 
-        // 캡처 실행
         const canvas = await html2canvas(exportArea, {
             scale: 2, 
             useCORS: true,
             backgroundColor: "#ffffff",
             width: 1000,
             height: 1000,
-            windowWidth: 1000,
-            windowHeight: 1000,
+            windowWidth: 1000, // ★ 가상 창 너비 강제 고정
+            windowHeight: 1000, // ★ 가상 창 높이 강제 고정
             x: 0,
             y: 0,
             scrollX: 0,
-            scrollY: 0,
-            onclone: (clonedDoc) => {
-                // 캡처용 가상 문서 내에서 스타일 강제 재지정
-                const target = clonedDoc.getElementById("exportArea");
-                target.style.display = "block";
-                target.style.width = "1000px";
-                target.style.height = "1000px";
-            }
+            scrollY: 0
         });
 
         const link = document.createElement("a");
@@ -261,7 +251,7 @@ async function saveAsImage() {
         link.href = canvas.toDataURL("image/png", 1.0);
         link.click();
     } catch (e) {
-        alert("이미지 생성에 실패했습니다.");
+        alert("이미지 저장에 실패했습니다.");
         console.error(e);
     }
 }
