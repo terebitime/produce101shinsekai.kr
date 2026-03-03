@@ -36,21 +36,39 @@ html, body {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    padding: 20px 0 !important; /* 상하 여백을 40px에서 20px로 줄임 */
+    padding: 15px 0 !important; /* 위아래 여백 축소 */
     background: #fff;
-    margin: 0 auto !important;
-    box-sizing: border-box !important;
+    width: 100% !important;
 }
 
 .pyramid-row {
     display: flex !important;
     justify-content: center !important;
-    align-items: flex-start !important;
-    gap: 10px !important;              /* 카드 사이 좌우 간격 축소 */
+    gap: 8px !important; /* 좌우 간격 축소 */
+    margin-bottom: 12px !important; /* 줄 사이 간격 축소 */
     width: 100% !important;
-    margin: 0 auto 15px auto !important; /* 줄 사이 간격을 25px에서 15px로 대폭 줄임 */
+}
+
+.top-card-slot {
+    width: 70px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+.top-card-slot .image-container {
+    width: 65px !important;
+    height: 65px !important; /* 4:4 정사각형 비율 */
+    border-radius: 50%;
+    border: 3px solid #007bff;
+    position: relative;
+}
+
+.top-card-slot img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 /* 4. 개별 슬롯 및 4:4 사진 비율 설정 */
