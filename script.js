@@ -1,52 +1,51 @@
-const traineeList = document.getElementById("trainee-list");
-const top11Container = document.getElementById("top11");
+function renderTop11() {
+  top11Container.innerHTML = ""; // 기존 내용 초기화
 
-let top11 = [];
+  // 1. 피라미드 층별 구성 (1층: 1명, 2층: 2명, 3층: 3명, 4층: 5명)
+  const rows = [1, 2, 3, 5];
+  let currentIdx = 0;
 
-// 🔹 연습생 전체 출력
-trainees.forEach((trainee, index) => {
-  const card = document.createElement("div");
-  card.className = "card";
+  rows.forEach((count, rowIndex) => {
+    // 각 층을 담당할 div 생성
+    const rowDiv = document.createElement("div");
+    rowDiv.className = `pyramid-row row-${rowIndex + 1}`;
+    
+    // 각 층에 들어갈 인원수만큼 반복
+    for (let i = 0; i < count; i++) {
+      const trainee = top11[currentIdx];
+      const slot = document.createElement("div");
+      slot.className = "top-card-slot"; // 슬롯 스타일
 
-  card.innerHTML = `
-    <img src="${trainee.img}" alt="${trainee.name}">
-    <p>${trainee.name}</p>
-  `;
-
-  card.addEventListener("click", () => selectTrainee(trainee));
-
-  traineeList.appendChild(card);
-});
-
-// 🔹 선택 함수
-function selectTrainee(trainee) {
-  // 이미 선택된 경우 무시
-  if (top11.includes(trainee)) return;
-
-  // 11명 초과 방지
-  if (top11.length >= 11) {
-    alert("TOP11은 최대 11명까지 선택 가능!");
-    return;
-  }
-
-  top11.push(trainee);
-  renderTop11();
+      if (trainee) {
+        // 선택된 연습생이 있는 경우
+        slot.innerHTML = `
+          <div class="image-container">
+            <img src="${trainee.img}" alt="${trainee.name}">
+            <div class="rank-badge">${currentIdx + 1}</div>
+          </div>
+          <p class="name">${trainee.name}</p>
+          <button class="remove-btn" onclick="removeTrainee(${currentIdx})">×</button>
+        `;
+      } else {
+        // 아직 선택되지 않은 빈 자리인 경우
+        slot.innerHTML = `
+          <div class="image-container empty">
+            <div class="rank-badge empty">${currentIdx + 1}</div>
+          </div>
+          <p class="name">-</p>
+        `;
+      }
+      
+      rowDiv.appendChild(slot);
+      currentIdx++;
+    }
+    
+    top11Container.appendChild(rowDiv);
+  });
 }
 
-// 🔹 TOP11 화면 출력
-function renderTop11() {
-  top11Container.innerHTML = "";
-
-  top11.forEach((trainee, index) => {
-    const card = document.createElement("div");
-    card.className = "top-card";
-
-    card.innerHTML = `
-      <div class="rank">${index + 1}</div>
-      <img src="${trainee.img}" alt="${trainee.name}">
-      <p>${trainee.name}</p>
-    `;
-
-    top11Container.appendChild(card);
-  });
+// 🔹 (추가 기능) 선택 취소 함수
+function removeTrainee(index) {
+  top11.splice(index, 1);
+  renderTop11();
 }
