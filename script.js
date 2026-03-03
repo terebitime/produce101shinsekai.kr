@@ -192,7 +192,6 @@ function removeTrainee(index) {
     renderTop11();
 }
 
-// ✅ 이미지 저장 기능 (정사각형 및 폰트 최종 수정)
 async function saveAsImage() {
     const exportPyramid = document.getElementById("exportPyramid");
     const exportArea = document.getElementById("exportArea");
@@ -208,21 +207,22 @@ async function saveAsImage() {
 
     rows.forEach(count => {
         const rowDiv = document.createElement("div");
-        rowDiv.style.cssText = "display: flex; justify-content: center; gap: 35px; width: 100%;";
+        // 저장용 피라미드 줄 간격 촘촘하게 수정
+        rowDiv.style.cssText = "display: flex; justify-content: center; gap: 25px; width: 100%; margin-bottom: 5px;";
         for (let i = 0; i < count; i++) {
             const trainee = top11[currentIdx];
             const slot = document.createElement("div");
-            slot.style.cssText = "width: 125px; text-align: center;";
+            slot.style.cssText = "width: 120px; text-align: center;";
             if (trainee) {
                 slot.innerHTML = `
-                    <div style="width: 115px; height: 115px; border-radius: 50%; border: 5px solid #0080ff; overflow: hidden; background: #fff; margin: 0 auto; position: relative;">
+                    <div style="width: 110px; height: 110px; border-radius: 50%; border: 5px solid #0080ff; overflow: hidden; background: #fff; margin: 0 auto; position: relative;">
                         <img src="${trainee.img}" style="width: 100%; height: 100%; object-fit: cover;">
-                        <div style="position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); background: #0080ff; color: #fff; border-radius: 999px; font-weight: 900; font-size: 11px; padding: 4px 10px;">${currentIdx + 1}</div>
+                        <div style="position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); background: #0080ff; color: #fff; border-radius: 999px; font-weight: 900; font-size: 11px; padding: 3px 8px;">${currentIdx + 1}</div>
                     </div>
-                    <div style="margin-top: 12px; font-size: 17px; font-weight: 900; color: #111;">${trainee.name}</div>
+                    <div style="margin-top: 8px; font-size: 16px; font-weight: 900; color: #111;">${trainee.name}</div>
                 `;
             } else {
-                slot.innerHTML = `<div style="width: 115px; height: 115px; border-radius: 50%; background: #f0f0f0; margin: 0 auto;"></div>`;
+                slot.innerHTML = `<div style="width: 110px; height: 110px; border-radius: 50%; background: #f0f0f0; margin: 0 auto;"></div>`;
             }
             rowDiv.appendChild(slot);
             currentIdx++;
@@ -231,32 +231,29 @@ async function saveAsImage() {
     });
 
     try {
-        // 폰트가 완전히 로딩되도록 충분한 시간(1.2초) 대기
         await document.fonts.ready;
         await new Promise(resolve => setTimeout(resolve, 1200));
 
-const canvas = await html2canvas(exportArea, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: "#ffffff",
-    width: 1000,          // 가로 1000px 고정
-    height: 1000,         // 세로 1000px 고정
-    windowWidth: 1000,    // 가상 창 가로 고정
-    windowHeight: 1000,   // 가상 창 세로 고정
-    x: 0,
-    y: 0,
-    scrollX: 0,
-    scrollY: 0,
-    logging: false
-});
-});
+        const canvas = await html2canvas(exportArea, {
+            scale: 2, 
+            useCORS: true,
+            backgroundColor: "#ffffff",
+            width: 1000,
+            height: 1000, // 정사각형 고정
+            windowWidth: 1000,
+            windowHeight: 1000,
+            x: 0,
+            y: 0,
+            scrollX: 0,
+            scrollY: 0
+        });
 
         const link = document.createElement("a");
-        link.download = "TOP11_PICK.png";
-        link.href = canvas.toDataURL("image/png", 1.0);
+        link.download = "SHINSEKAI_TOP11.png";
+        link.href = canvas.toDataURL("image/png");
         link.click();
     } catch (e) {
-        alert("저장에 실패했습니다.");
+        alert("저장 실패");
         console.error(e);
     }
 }
