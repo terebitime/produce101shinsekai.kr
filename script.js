@@ -203,33 +203,42 @@ function removeTrainee(index) {
 async function saveAsImage() {
     const exportPyramid = document.getElementById("exportPyramid");
     const exportArea = document.getElementById("exportArea");
+    const exportInner = document.getElementById("exportInner");
     
-    // 1. 저장용 영역 비우기
+    // 1. 저장용 영역 정사각형(1000x1000) 강제 설정
+    exportArea.style.width = "1000px";
+    exportArea.style.height = "1000px";
+    exportInner.style.height = "1000px";
+    exportInner.style.display = "flex";
+    exportInner.style.flexDirection = "column";
+    exportInner.style.justifyContent = "space-between"; // 상-중-하 균형 배치
+    
+    // 2. 피라미드 영역 비우고 다시 채우기
     exportPyramid.innerHTML = "";
     
-    // 2. 현재 선택된 멤버 데이터를 저장용 규격으로 복사하기
     const rows = [1, 2, 3, 5];
     let currentIdx = 0;
 
     rows.forEach(count => {
         const rowDiv = document.createElement("div");
-        rowDiv.style.cssText = "display: flex; justify-content: center; gap: 40px; width: 100%;";
+        // 정사각형 안에서 너무 퍼지지 않게 간격 조정 (gap: 35px)
+        rowDiv.style.cssText = "display: flex; justify-content: center; gap: 35px; width: 100%;";
         
         for (let i = 0; i < count; i++) {
             const trainee = top11[currentIdx];
             const slot = document.createElement("div");
-            slot.style.cssText = "width: 130px; text-align: center;";
+            slot.style.cssText = "width: 125px; text-align: center;";
             
             if (trainee) {
                 slot.innerHTML = `
-                    <div style="width: 130px; height: 130px; border-radius: 50%; border: 6px solid #0080ff; overflow: hidden; background: #fff; box-shadow: 0 8px 15px rgba(0,0,0,0.1); margin: 0 auto; position: relative;">
+                    <div style="width: 120px; height: 120px; border-radius: 50%; border: 5px solid #0080ff; overflow: hidden; background: #fff; box-shadow: 0 6px 12px rgba(0,0,0,0.1); margin: 0 auto; position: relative;">
                         <img src="${trainee.img}" style="width: 100%; height: 100%; object-fit: cover;">
-                        <div style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: #0080ff; color: #fff; border-radius: 999px; font-weight: 900; font-size: 12px; padding: 4px 10px;">${currentIdx + 1}</div>
+                        <div style="position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); background: #0080ff; color: #fff; border-radius: 999px; font-weight: 900; font-size: 11px; padding: 3px 9px;">${currentIdx + 1}</div>
                     </div>
-                    <div style="margin-top: 20px; font-size: 18px; font-weight: 900; color: #111;">${trainee.name}</div>
+                    <div style="margin-top: 12px; font-size: 16px; font-weight: 900; color: #111; letter-spacing: -0.5px;">${trainee.name}</div>
                 `;
             } else {
-                slot.innerHTML = `<div style="width: 130px; height: 130px; border-radius: 50%; background: #f0f0f0; opacity: 0.3; margin: 0 auto;"></div>`;
+                slot.innerHTML = `<div style="width: 120px; height: 120px; border-radius: 50%; background: #f5f5f5; margin: 0 auto;"></div>`;
             }
             rowDiv.appendChild(slot);
             currentIdx++;
@@ -237,22 +246,25 @@ async function saveAsImage() {
         exportPyramid.appendChild(rowDiv);
     });
 
-    // 3. 실제 캡처 작업
+    // 3. 캡처 작업 (정사각형 사이즈 명시)
     try {
-        await new Promise(resolve => setTimeout(resolve, 500)); // 이미지 로딩 대기
+        await new Promise(resolve => setTimeout(resolve, 600)); // 로딩 대기시간 살짝 증가
 
         const canvas = await html2canvas(exportArea, {
             scale: 2, 
             useCORS: true,
             backgroundColor: "#ffffff",
-            width: 1000, 
-            windowWidth: 1000
+            width: 1000,   // 가로 1000px 고정
+            height: 1000,  // 세로 1000px 고정 (정사각형 핵심)
+            windowWidth: 1000,
+            windowHeight: 1000
         });
 
         const link = document.createElement("a");
         link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
         link.href = canvas.toDataURL("image/png", 1.0);
         link.click();
+        
     } catch (e) {
         alert("이미지 저장에 실패했습니다.");
         console.error(e);
