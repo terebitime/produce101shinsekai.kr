@@ -121,82 +121,58 @@ const trainees = [
     { name: "오카모토 유토", img: "image/119.jpg" }
 ];
 
-// 2. 변수 선언 (함수 밖에서 미리 정의)
-let top11 = [];
+// (상단에 기존 trainees 데이터 배열을 유지하세요!)
 
-// 3. 페이지 로드 시 실행되는 메인 함수
+let top11 = [];
+const top11Container = document.getElementById("top11");
+
 window.onload = function() {
-    console.log("페이지 로드 완료! 초기화 시작...");
     initTraineeList();
     renderTop11();
 };
 
-// 4. 리스트 초기화 함수
 function initTraineeList() {
     const listContainer = document.getElementById("trainee-list");
-    if (!listContainer) return;
-
     listContainer.innerHTML = "";
-    trainees.forEach((trainee, index) => {
+    trainees.forEach((trainee) => {
         const card = document.createElement("div");
         card.className = "card";
-        card.innerHTML = `
-            <img src="${trainee.img}" alt="${trainee.name}">
-            <p class="name-text">${trainee.name}</p>
-        `;
+        card.innerHTML = `<img src="${trainee.img}"><p class="name-text">${trainee.name}</p>`;
         card.onclick = () => selectTrainee(trainee);
         listContainer.appendChild(card);
     });
 }
 
-// 5. 연습생 선택
 function selectTrainee(trainee) {
-    if (top11.includes(trainee)) {
-        alert("이미 선택한 연습생입니다!");
-        return;
-    }
-    if (top11.length >= 11) {
-        alert("최대 11명까지만 선택 가능합니다.");
-        return;
-    }
+    if (top11.includes(trainee)) return;
+    if (top11.length >= 11) return;
     top11.push(trainee);
     renderTop11();
 }
 
-// 6. 피라미드 렌더링
 function renderTop11() {
-    const top11Container = document.getElementById("top11");
-    if (!top11Container) return;
-
-    top11Container.innerHTML = ""; 
+    top11Container.innerHTML = "";
     const rows = [1, 2, 3, 5];
     let currentIdx = 0;
 
-    rows.forEach((count, rowIndex) => {
+    rows.forEach((count) => {
         const rowDiv = document.createElement("div");
-        rowDiv.className = `pyramid-row row-${rowIndex + 1}`;
-        
+        rowDiv.className = "pyramid-row";
         for (let i = 0; i < count; i++) {
             const trainee = top11[currentIdx];
             const slot = document.createElement("div");
-            slot.className = "top-card-slot"; 
-
+            slot.className = "top-card-slot";
             if (trainee) {
                 slot.innerHTML = `
                     <div class="image-container">
-                        <img src="${trainee.img}" alt="${trainee.name}">
+                        <img src="${trainee.img}">
                         <div class="rank-badge">${currentIdx + 1}</div>
-                        <button class="remove-btn" onclick="removeTrainee(${currentIdx})">×</button>
+                        <button class="remove-btn" onclick="event.stopPropagation(); removeTrainee(${currentIdx})">×</button>
                     </div>
                     <p class="name">${trainee.name}</p>
                 `;
             } else {
-                slot.innerHTML = `
-                    <div class="image-container empty">
-                        <div class="rank-badge empty">${currentIdx + 1}</div>
-                    </div>
-                    <p class="name">-</p>
-                `;
+                slot.innerHTML = `<div class="image-container empty"><div class="rank-badge">${currentIdx + 1}</div></div><p class="name">-</p>`;
             }
             rowDiv.appendChild(slot);
             currentIdx++;
@@ -205,40 +181,56 @@ function renderTop11() {
     });
 }
 
-// 7. 선택 취소
 function removeTrainee(index) {
     top11.splice(index, 1);
     renderTop11();
 }
 
-// 8. 이미지 저장 함수
-function saveAsImage() {
+// ✅ 저장 기능: 하단에 itterashaiyade 아이디만 표시
+async function saveAsImage() {
     const target = document.getElementById("top11");
+    
+    // 1. 캡처 전 삭제 버튼(×) 숨기기
+    const buttons = document.querySelectorAll('.remove-btn');
+    buttons.forEach(btn => btn.style.display = 'none');
 
-    if (top11.length === 0) {
-        alert("먼저 연습생을 선택해주세요!");
-        return;
-    }
-
-    // 캡처 시 삭제 버튼 숨기기
-    const removeButtons = document.querySelectorAll('.remove-btn');
-    removeButtons.forEach(btn => btn.style.visibility = 'hidden');
-
-    html2canvas(target, {
-        backgroundColor: "#ffffff", // 배경 흰색
-        useCORS: true,             // 이미지 불러오기 허용
-        scale: 2,                  // 고화질
-        logging: false
+    // 2. html2canvas로 피라미드 영역 캡처
+    html2canvas(target, { 
+        scale: 3, // 고해상도 설정
+        backgroundColor: "#ffffff",
+        useCORS: true 
     }).then(canvas => {
+        const width = canvas.width;
+        const height = canvas.height;
+
+        // 3. 하단 여백을 포함한 최종 캔버스 생성
+        const finalCanvas = document.createElement('canvas');
+        finalCanvas.width = width;
+        finalCanvas.height = height + 120; // 아이디가 들어갈 공간 확보
+        const finalCtx = finalCanvas.getContext('2d');
+
+        // 배경색 채우기 (흰색)
+        finalCtx.fillStyle = "#ffffff";
+        finalCtx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+        // 원본 피라미드 이미지 그리기
+        finalCtx.drawImage(canvas, 0, 0);
+
+        // 4. 요청하신 아이디(itterashaiyade) 추가
+        finalCtx.fillStyle = "#aaaaaa"; // 연한 회색으로 저작권 느낌 강조
+        finalCtx.font = "bold 36px HakgyoansimBareunDotum";
+        finalCtx.textAlign = "right"; // 우측 정렬
+        
+        // 이미지 우측 하단에 배치
+        finalCtx.fillText("@itterashaiyade", width - 50, height + 70);
+
+        // 5. 이미지 파일로 다운로드
         const link = document.createElement("a");
-        
-        // ✅ 다운로드될 파일명을 신세카이 버전으로 변경!
-        link.download = "PRODUCE_101_SHINSEKAI_TOP11.png"; 
-        
-        link.href = canvas.toDataURL("image/png");
+        link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
+        link.href = finalCanvas.toDataURL("image/png");
         link.click();
-        
-        // 캡처 후 삭제 버튼 다시 보이게
-        removeButtons.forEach(btn => btn.style.visibility = 'visible');
+
+        // 6. 캡처 완료 후 삭제 버튼 다시 표시
+        buttons.forEach(btn => btn.style.display = 'flex');
     });
 }
