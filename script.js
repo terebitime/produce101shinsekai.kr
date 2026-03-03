@@ -150,10 +150,9 @@ async function saveAsImage() {
     const exportPyramid = document.getElementById("exportPyramid");
     const exportArea = document.getElementById("exportArea");
     
-    // 1. 저장용 영역 초기화
     exportPyramid.innerHTML = "";
     
-    // 2. 현재 선택된 멤버 데이터를 정사각형 규격에 맞춰 생성
+    // 1-2-3-5 구조 생성 (기존 로직 유지)
     const rows = [1, 2, 3, 5];
     let currentIdx = 0;
 
@@ -183,24 +182,23 @@ async function saveAsImage() {
         exportPyramid.appendChild(rowDiv);
     });
 
-    // 3. 실제 캡처 작업 (정사각형 강제 설정)
     try {
-        // 이미지 로딩을 위한 짧은 대기
-        await new Promise(resolve => setTimeout(resolve, 700));
+        // ★ 폰트 로딩 대기 시간을 조금 더 늘려줍니다 (800ms)
+        await new Promise(resolve => setTimeout(resolve, 800));
 
         const canvas = await html2canvas(exportArea, {
             scale: 2, 
             useCORS: true,
             backgroundColor: "#ffffff",
-            width: 1000,   // 가로 고정
-            height: 1000,  // 세로 고정 (정사각형 유지 핵심)
+            width: 1000,   // 1:1 비율 고정
+            height: 1000,  // 1:1 비율 고정
             windowWidth: 1000,
             windowHeight: 1000,
             logging: false
         });
 
         const link = document.createElement("a");
-        link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
+        link.download = "SHINSEKAI_TOP11_SQUARE.png";
         link.href = canvas.toDataURL("image/png", 1.0);
         link.click();
     } catch (e) {
