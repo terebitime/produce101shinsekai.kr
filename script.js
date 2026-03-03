@@ -251,6 +251,7 @@ async function saveAsImage() {
             logging: false
         });
 
+        
         const link = document.createElement("a");
         link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
         link.href = canvas.toDataURL("image/png", 1.0);
