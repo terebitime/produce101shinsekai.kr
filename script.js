@@ -237,18 +237,19 @@ async function saveAsImage() {
 
 
 const canvas = await html2canvas(exportArea, {
-    scale: 2,             // 고화질 저장
-    useCORS: true,        // 이미지 로딩 허용
+   // script.js의 saveAsImage 함수 안의 html2canvas 부분을 아래로 교체
+const canvas = await html2canvas(exportArea, {
+    scale: 2,             // 선명도를 위해 2배 확대 (2000x2000 결과물)
+    useCORS: true,
     backgroundColor: "#ffffff",
     width: 1000,          // 가로 1000px 고정
-    height: 1000,         // 세로 1000px 고정 (이게 없으면 길어짐)
-    windowWidth: 1000,    // 뷰포트 가로 고정
-    windowHeight: 1000,   // 뷰포트 세로 고정 (주변 여백 무시)
-    x: 0,
-    y: 0,
+    height: 1000,         // 세로 1000px 고정
+    windowWidth: 1000,    // 캡처 환경 가로 1000px 고정
+    windowHeight: 1000,   // 캡처 환경 세로 1000px 고정
     scrollX: 0,
     scrollY: 0,
-    logging: false
+    x: 0,
+    y: 0
 });
 
         const link = document.createElement("a");
