@@ -1,38 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>PRODUCE 101 신세카이</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <meta charset="UTF-8">
+    <title>PRODUCE 101 신세카이</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
-
 <body>
 
-  <h1>AUDITION PICK · YOUR TOP 11</h1>
+    <h1>AUDITION PICK · YOUR TOP 11</h1>
 
-  <div id="top11" class="top11-container"></div>
+    <div id="top11" class="top11-container"></div>
 
-  <div class="button-area">
-    <button onclick="saveAsImage()" class="save-btn">나의 TOP 11 이미지로 저장하기</button>
-  </div>
+    <div class="button-area">
+        <button onclick="saveAsImage()" class="save-btn">나의 TOP 11 이미지로 저장하기</button>
+    </div>
 
-  <div id="trainee-list" class="grid"></div>
+    <div id="trainee-list" class="grid"></div>
 
-  <script src="trainees.js"></script>
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
-<script src="trainees.js"></script>
-
-<script>
-  // trainees.js가 잘 로드되었는지 확인하는 테스트용 코드
-  window.onload = function() {
-    if (typeof trainees === 'undefined') {
-      console.error("❌ 에러: trainees.js 파일을 찾을 수 없거나 데이터가 없습니다.");
-      alert("데이터를 불러오지 못했습니다. 파일 이름을 확인해주세요!");
-    } else {
-      console.log("✅ 성공: " + trainees.length + "명의 연습생 데이터를 불러왔습니다.");
-    }
-  };
-</script>
-
-<script src="script.js"></script>
+</html>
