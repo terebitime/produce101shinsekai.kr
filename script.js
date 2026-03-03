@@ -207,21 +207,21 @@ async function saveAsImage() {
 
     rows.forEach(count => {
         const rowDiv = document.createElement("div");
-        rowDiv.style.cssText = "display: flex; justify-content: center; gap: 35px; width: 100%;";
+        rowDiv.style.cssText = "display: flex; justify-content: center; gap: 30px; width: 100%;";
         for (let i = 0; i < count; i++) {
             const trainee = top11[currentIdx];
             const slot = document.createElement("div");
             slot.style.cssText = "width: 125px; text-align: center;";
             if (trainee) {
                 slot.innerHTML = `
-                    <div style="width: 120px; height: 120px; border-radius: 50%; border: 6px solid #0080ff; overflow: hidden; background: #fff; margin: 0 auto; position: relative;">
+                    <div style="width: 115px; height: 115px; border-radius: 50%; border: 5px solid #0080ff; overflow: hidden; background: #fff; margin: 0 auto; position: relative;">
                         <img src="${trainee.img}" style="width: 100%; height: 100%; object-fit: cover;">
-                        <div style="position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); background: #0080ff; color: #fff; border-radius: 999px; font-weight: 900; font-size: 11px; padding: 4px 10px;">${currentIdx + 1}</div>
+                        <div style="position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); background: #0080ff; color: #fff; border-radius: 999px; font-weight: 900; font-size: 11px; padding: 3px 9px;">${currentIdx + 1}</div>
                     </div>
-                    <div style="margin-top: 12px; font-size: 17px; font-weight: 900; color: #111;">${trainee.name}</div>
+                    <div style="margin-top: 10px; font-size: 16px; font-weight: 900; color: #111;">${trainee.name}</div>
                 `;
             } else {
-                slot.innerHTML = `<div style="width: 120px; height: 120px; border-radius: 50%; background: #f0f0f0; margin: 0 auto;"></div>`;
+                slot.innerHTML = `<div style="width: 115px; height: 115px; border-radius: 50%; background: #f4f4f4; margin: 0 auto;"></div>`;
             }
             rowDiv.appendChild(slot);
             currentIdx++;
@@ -230,7 +230,7 @@ async function saveAsImage() {
     });
 
     try {
-        // 폰트 로딩 대기
+        // 폰트가 완전히 로드될 때까지 1초 대기
         await document.fonts.ready;
         await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -239,24 +239,23 @@ async function saveAsImage() {
             useCORS: true,
             backgroundColor: "#ffffff",
             width: 1000,
-            height: 1000, // ★ 높이 1000px 강제 고정 (정사각형)
+            height: 1000, // 정사각형 강제 고정
             windowWidth: 1000,
             windowHeight: 1000,
             x: 0,
             y: 0,
             scrollX: 0,
-            scrollY: 0
+            scrollY: 0,
+            logging: false
         });
 
         const link = document.createElement("a");
-        link.download = "SHINSEKAI_TOP11.png";
-        link.href = canvas.toDataURL("image/png");
+        link.download = `TOP11_PICK.png`;
+        link.href = canvas.toDataURL("image/png", 1.0);
         link.click();
     } catch (e) {
         alert("이미지 저장에 실패했습니다.");
         console.error(e);
     }
-}
-        console.error(e);
-    }
-}
+};
+  
