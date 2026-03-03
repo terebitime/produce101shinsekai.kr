@@ -211,27 +211,34 @@ function removeTrainee(index) {
     renderTop11();
 }
 
-// 8. 이미지 저장
+// 8. 이미지 저장 함수
 function saveAsImage() {
     const target = document.getElementById("top11");
+
     if (top11.length === 0) {
         alert("먼저 연습생을 선택해주세요!");
         return;
     }
 
+    // 캡처 시 삭제 버튼 숨기기
     const removeButtons = document.querySelectorAll('.remove-btn');
     removeButtons.forEach(btn => btn.style.visibility = 'hidden');
 
     html2canvas(target, {
-        backgroundColor: "#ffffff",
-        useCORS: true,
-        scale: 2,
+        backgroundColor: "#ffffff", // 배경 흰색
+        useCORS: true,             // 이미지 불러오기 허용
+        scale: 2,                  // 고화질
         logging: false
     }).then(canvas => {
         const link = document.createElement("a");
-        link.download = "my-shinsekai-top11.png";
+        
+        // ✅ 다운로드될 파일명을 신세카이 버전으로 변경!
+        link.download = "PRODUCE_101_SHINSEKAI_TOP11.png"; 
+        
         link.href = canvas.toDataURL("image/png");
         link.click();
+        
+        // 캡처 후 삭제 버튼 다시 보이게
         removeButtons.forEach(btn => btn.style.visibility = 'visible');
     });
 }
