@@ -199,69 +199,62 @@ function removeTrainee(index) {
 }
 
 // ✅ 2. 저장 기능: 사이즈 800px 고정 및 하단 여백 최적화
+// 기존 saveAsImage 함수를 찾아서 이 내용으로 덮어쓰기 하세요
 async function saveAsImage() {
-    const logoArea = document.querySelector('.logo-container');
-    const pyramidArea = document.querySelector('.top11-container');
-    const removeBtns = document.querySelectorAll('.remove-btn');
+    const exportPyramid = document.getElementById("exportPyramid");
+    const exportArea = document.getElementById("exportArea");
     
-    if (!logoArea || !pyramidArea) return;
+    // 1. 저장용 영역 비우기
+    exportPyramid.innerHTML = "";
+    
+    // 2. 현재 선택된 멤버 데이터를 저장용 규격으로 복사하기
+    const rows = [1, 2, 3, 5];
+    let currentIdx = 0;
 
-    removeBtns.forEach(btn => btn.style.display = 'none');
-
-    try {
-        // 로고와 이미지가 완전히 그려질 시간을 확보 (1초)
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        const options = { 
-            scale: 2, 
-            useCORS: true, 
-            backgroundColor: "#ffffff",
-            logging: false
-        };
-
-        const logoCanvas = await html2canvas(logoArea, options);
-        const pyramidCanvas = await html2canvas(pyramidArea, options);
-
-        const finalCanvas = document.createElement('canvas');
-        const ctx = finalCanvas.getContext('2d');
-
-        // ✅ 규격 강제 고정: 가로 800px (이게 핵심입니다)
-        const standardWidth = 800;
+    rows.forEach(count => {
+        const rowDiv = document.createElement("div");
+        rowDiv.style.cssText = "display: flex; justify-content: center; gap: 40px; width: 100%;";
         
-        // 원본 비율을 유지하며 높이 계산
-        const logoHeight = logoCanvas.height * (standardWidth / logoCanvas.width);
-        const pyramidHeight = pyramidCanvas.height * (standardWidth / pyramidCanvas.width);
-        const footerHeight = 100; // 하단 아이디 영역 여백
+        for (let i = 0; i < count; i++) {
+            const trainee = top11[currentIdx];
+            const slot = document.createElement("div");
+            slot.style.cssText = "width: 130px; text-align: center;";
+            
+            if (trainee) {
+                slot.innerHTML = `
+                    <div style="width: 130px; height: 130px; border-radius: 50%; border: 6px solid #0080ff; overflow: hidden; background: #fff; box-shadow: 0 8px 15px rgba(0,0,0,0.1); margin: 0 auto; position: relative;">
+                        <img src="${trainee.img}" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: #0080ff; color: #fff; border-radius: 999px; font-weight: 900; font-size: 12px; padding: 4px 10px;">${currentIdx + 1}</div>
+                    </div>
+                    <div style="margin-top: 20px; font-size: 18px; font-weight: 900; color: #111;">${trainee.name}</div>
+                `;
+            } else {
+                slot.innerHTML = `<div style="width: 130px; height: 130px; border-radius: 50%; background: #f0f0f0; opacity: 0.3; margin: 0 auto;"></div>`;
+            }
+            rowDiv.appendChild(slot);
+            currentIdx++;
+        }
+        exportPyramid.appendChild(rowDiv);
+    });
 
-        finalCanvas.width = standardWidth;
-        finalCanvas.height = logoHeight + pyramidHeight + footerHeight;
+    // 3. 실제 캡처 작업
+    try {
+        await new Promise(resolve => setTimeout(resolve, 500)); // 이미지 로딩 대기
 
-        // 배경색 (흰색)
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+        const canvas = await html2canvas(exportArea, {
+            scale: 2, 
+            useCORS: true,
+            backgroundColor: "#ffffff",
+            width: 1000, 
+            windowWidth: 1000
+        });
 
-        // 1. 상단 로고 그리기
-        ctx.drawImage(logoCanvas, 0, 0, standardWidth, logoHeight);
-
-        // 2. 중앙 피라미드 그리기
-        ctx.drawImage(pyramidCanvas, 0, logoHeight, standardWidth, pyramidHeight);
-
-        // 3. 하단 @itterashaiyade (우측 하단 고정)
-        ctx.fillStyle = "#000000";
-        ctx.font = "bold 26px sans-serif"; 
-        ctx.textAlign = "right";
-        ctx.fillText("@itterashaiyade", finalCanvas.width - 40, finalCanvas.height - 40);
-
-        // 파일 저장
         const link = document.createElement("a");
         link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
-        link.href = finalCanvas.toDataURL("image/png", 1.0);
+        link.href = canvas.toDataURL("image/png", 1.0);
         link.click();
-        
     } catch (e) {
+        alert("이미지 저장에 실패했습니다.");
         console.error(e);
-        alert("이미지 저장에 실패했습니다. 사파리 설정에서 방문 기록을 지우고 다시 시도해 주세요!");
-    } finally {
-        removeBtns.forEach(btn => btn.style.display = 'flex');
     }
 }
