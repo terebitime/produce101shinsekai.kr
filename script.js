@@ -198,44 +198,40 @@ function removeTrainee(index) {
     renderTop11();
 }
 
-// ✅ 2. 저장 기능: 사이즈 800px 고정 및 하단 여백 최적화
-// 기존 saveAsImage 함수를 찾아서 이 내용으로 덮어쓰기 하세요
+// ✅ 2. 저장 기능: 1000x1000 정사각형 사이즈 고정 및 중앙 배치
 async function saveAsImage() {
     const exportPyramid = document.getElementById("exportPyramid");
     const exportArea = document.getElementById("exportArea");
-    const exportInner = document.getElementById("exportInner");
+    const exportInner = document.getElementById("exportInner"); // 내부 컨테이너
     
-    // 1. 저장용 영역 정사각형(1000x1000) 강제 설정
-    exportArea.style.width = "1000px";
-    exportArea.style.height = "1000px";
-    exportInner.style.height = "1000px";
-    exportInner.style.display = "flex";
-    exportInner.style.flexDirection = "column";
-    exportInner.style.justifyContent = "space-between"; // 상-중-하 균형 배치
+    // 1. 저장 영역을 정사각형(1:1)으로 강제 고정 및 중앙 정렬 세팅
+    exportArea.style.cssText = "position: fixed; left: -9999px; top: 0; width: 1000px; height: 1000px; background: #ffffff;";
+    exportInner.style.cssText = "width: 1000px; height: 1000px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; padding: 40px 0;";
     
-    // 2. 피라미드 영역 비우고 다시 채우기
+    // 2. 피라미드 영역 비우기
     exportPyramid.innerHTML = "";
     
+    // 3. 현재 선택된 멤버 데이터를 정사각형 규격에 맞춰 배치
     const rows = [1, 2, 3, 5];
     let currentIdx = 0;
 
     rows.forEach(count => {
         const rowDiv = document.createElement("div");
-        // 정사각형 안에서 너무 퍼지지 않게 간격 조정 (gap: 35px)
-        rowDiv.style.cssText = "display: flex; justify-content: center; gap: 35px; width: 100%;";
+        // 정사각형 안에서 너무 퍼지지 않도록 간격(gap)을 30px로 조정
+        rowDiv.style.cssText = "display: flex; justify-content: center; gap: 30px; width: 100%; margin-bottom: 25px;";
         
         for (let i = 0; i < count; i++) {
             const trainee = top11[currentIdx];
             const slot = document.createElement("div");
-            slot.style.cssText = "width: 125px; text-align: center;";
+            slot.style.cssText = "width: 120px; text-align: center;";
             
             if (trainee) {
                 slot.innerHTML = `
                     <div style="width: 120px; height: 120px; border-radius: 50%; border: 5px solid #0080ff; overflow: hidden; background: #fff; box-shadow: 0 6px 12px rgba(0,0,0,0.1); margin: 0 auto; position: relative;">
                         <img src="${trainee.img}" style="width: 100%; height: 100%; object-fit: cover;">
-                        <div style="position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); background: #0080ff; color: #fff; border-radius: 999px; font-weight: 900; font-size: 11px; padding: 3px 9px;">${currentIdx + 1}</div>
+                        <div style="position: absolute; bottom: -3px; left: 50%; transform: translateX(-50%); background: #0080ff; color: #fff; border-radius: 999px; font-weight: 900; font-size: 11px; padding: 3px 9px;">${currentIdx + 1}</div>
                     </div>
-                    <div style="margin-top: 12px; font-size: 16px; font-weight: 900; color: #111; letter-spacing: -0.5px;">${trainee.name}</div>
+                    <div style="margin-top: 12px; font-size: 16px; font-weight: 900; color: #111;">${trainee.name}</div>
                 `;
             } else {
                 slot.innerHTML = `<div style="width: 120px; height: 120px; border-radius: 50%; background: #f5f5f5; margin: 0 auto;"></div>`;
@@ -246,16 +242,16 @@ async function saveAsImage() {
         exportPyramid.appendChild(rowDiv);
     });
 
-    // 3. 캡처 작업 (정사각형 사이즈 명시)
+    // 4. 실제 캡처 작업 (정사각형 영역 지정)
     try {
-        await new Promise(resolve => setTimeout(resolve, 600)); // 로딩 대기시간 살짝 증가
+        await new Promise(resolve => setTimeout(resolve, 600)); // 이미지 로딩 대기
 
         const canvas = await html2canvas(exportArea, {
             scale: 2, 
             useCORS: true,
             backgroundColor: "#ffffff",
             width: 1000,   // 가로 1000px 고정
-            height: 1000,  // 세로 1000px 고정 (정사각형 핵심)
+            height: 1000,  // 세로 1000px 고정 (이게 없으면 길게 나옵니다)
             windowWidth: 1000,
             windowHeight: 1000
         });
@@ -264,7 +260,6 @@ async function saveAsImage() {
         link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
         link.href = canvas.toDataURL("image/png", 1.0);
         link.click();
-        
     } catch (e) {
         alert("이미지 저장에 실패했습니다.");
         console.error(e);
