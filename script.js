@@ -191,6 +191,7 @@ function removeTrainee(index) {
     renderTop11();
 }
 
+// ✅ 이미지 저장 함수 (정사각형 고정 최종본)
 async function saveAsImage() {
     const exportPyramid = document.getElementById("exportPyramid");
     const exportArea = document.getElementById("exportArea");
@@ -206,7 +207,6 @@ async function saveAsImage() {
 
     rows.forEach(count => {
         const rowDiv = document.createElement("div");
-        // 저장 시 줄 간격을 촘촘하게 고정 (정사각형을 위해)
         rowDiv.style.cssText = "display: flex; justify-content: center; gap: 20px; width: 100%; margin-bottom: 5px;";
         for (let i = 0; i < count; i++) {
             const trainee = top11[currentIdx];
@@ -230,21 +230,30 @@ async function saveAsImage() {
     });
 
     try {
+        // 폰트 및 리소스 대기
         await document.fonts.ready;
-        await new Promise(resolve => setTimeout(resolve, 1200));
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
+        // 캡처 실행
         const canvas = await html2canvas(exportArea, {
             scale: 2, 
             useCORS: true,
             backgroundColor: "#ffffff",
             width: 1000,
-            height: 1000, // ★ 세로를 1000px로 강력하게 절단
+            height: 1000,
             windowWidth: 1000,
             windowHeight: 1000,
             x: 0,
             y: 0,
             scrollX: 0,
-            scrollY: 0
+            scrollY: 0,
+            onclone: (clonedDoc) => {
+                // 캡처용 가상 문서 내에서 스타일 강제 재지정
+                const target = clonedDoc.getElementById("exportArea");
+                target.style.display = "block";
+                target.style.width = "1000px";
+                target.style.height = "1000px";
+            }
         });
 
         const link = document.createElement("a");
@@ -252,7 +261,7 @@ async function saveAsImage() {
         link.href = canvas.toDataURL("image/png", 1.0);
         link.click();
     } catch (e) {
-        alert("이미지 저장에 실패했습니다.");
+        alert("이미지 생성에 실패했습니다.");
         console.error(e);
     }
 }
