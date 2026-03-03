@@ -204,10 +204,12 @@ async function saveAsImage() {
     const pyramidArea = document.querySelector('.top11-container');
     const removeBtns = document.querySelectorAll('.remove-btn');
     
+    if (!logoArea || !pyramidArea) return;
+
     removeBtns.forEach(btn => btn.style.display = 'none');
 
     try {
-        // 이미지 로딩 대기 시간 (1초)
+        // 로고와 이미지가 완전히 그려질 시간을 확보 (1초)
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         const options = { 
@@ -223,38 +225,42 @@ async function saveAsImage() {
         const finalCanvas = document.createElement('canvas');
         const ctx = finalCanvas.getContext('2d');
 
-        // 🚀 결과물 가로 크기를 800px로 표준화 (기기별 사이즈 차이 해결)
+        // ✅ 규격 강제 고정: 가로 800px (이게 핵심입니다)
         const standardWidth = 800;
+        
+        // 원본 비율을 유지하며 높이 계산
         const logoHeight = logoCanvas.height * (standardWidth / logoCanvas.width);
         const pyramidHeight = pyramidCanvas.height * (standardWidth / pyramidCanvas.width);
-        const footerHeight = 120; // 하단 아이디 영역 확보
+        const footerHeight = 100; // 하단 아이디 영역 여백
 
         finalCanvas.width = standardWidth;
         finalCanvas.height = logoHeight + pyramidHeight + footerHeight;
 
-        // 전체 배경 흰색
+        // 배경색 (흰색)
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
 
-        // 상단 로고
+        // 1. 상단 로고 그리기
         ctx.drawImage(logoCanvas, 0, 0, standardWidth, logoHeight);
 
-        // 중앙 피라미드
+        // 2. 중앙 피라미드 그리기
         ctx.drawImage(pyramidCanvas, 0, logoHeight, standardWidth, pyramidHeight);
 
-        // 하단 @itterashaiyade (검은색 고정)
+        // 3. 하단 @itterashaiyade (우측 하단 고정)
         ctx.fillStyle = "#000000";
-        ctx.font = "bold 28px sans-serif"; 
+        ctx.font = "bold 26px sans-serif"; 
         ctx.textAlign = "right";
         ctx.fillText("@itterashaiyade", finalCanvas.width - 40, finalCanvas.height - 40);
 
+        // 파일 저장
         const link = document.createElement("a");
         link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
         link.href = finalCanvas.toDataURL("image/png", 1.0);
         link.click();
         
     } catch (e) {
-        alert("이미지 저장에 실패했습니다.");
+        console.error(e);
+        alert("이미지 저장에 실패했습니다. 사파리 설정에서 방문 기록을 지우고 다시 시도해 주세요!");
     } finally {
         removeBtns.forEach(btn => btn.style.display = 'flex');
     }
