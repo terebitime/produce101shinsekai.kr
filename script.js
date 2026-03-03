@@ -121,42 +121,73 @@ const trainees = [
     { name: "오카모토 유토", img: "image/119.jpg" }
 ];
 
-// 1. 변수 선언 (가장 상단에 있어야 합니다)
-let top11 = []; 
+// 1. 전역 변수 설정
+let top11 = [];
 const top11Container = document.getElementById("top11");
 
-// 2. 페이지 로드 시 실행
+// 2. 페이지 로드 시 초기화
 window.onload = function() {
-    initTraineeList();
+    if (typeof trainees !== 'undefined') {
+        initTraineeList();
+    } else {
+        console.error("trainees 데이터가 정의되지 않았습니다. trainees.js 파일을 확인해주세요.");
+    }
     renderTop11();
 };
 
-// 3. 연습생 선택 로직 (보내주신 수정본 적용)
+// 3. 연습생 리스트 생성
+function initTraineeList() {
+    const listContainer = document.getElementById("trainee-list");
+    if (!listContainer) return;
+    
+    listContainer.innerHTML = "";
+    trainees.forEach((trainee) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+            <img src="${trainee.img}" alt="${trainee.name}">
+            <p class="name-text">${trainee.name}</p>
+        `;
+        card.onclick = () => selectTrainee(trainee);
+        listContainer.appendChild(card);
+    });
+}
+
+// 4. 연습생 선택 로직 (중복 알림 포함)
 function selectTrainee(trainee) {
+    // 이미 선택된 경우
     if (top11.includes(trainee)) {
-        alert("이미 선택된 연습생입니다."); 
+        alert("이미 선택된 연습생입니다.");
         return;
     }
+    
+    // 11명이 꽉 찬 경우
     if (top11.length >= 11) {
         alert("최대 11명까지만 선택할 수 있습니다.");
         return;
     }
+
     top11.push(trainee);
     renderTop11();
 }
 
-// 4. 피라미드 그리기 함수
+// 5. 피라미드 렌더링 (간격 및 비율 최적화)
 function renderTop11() {
+    if (!top11Container) return;
     top11Container.innerHTML = "";
-    const rows = [1, 2, 3, 5];
+    
+    const rows = [1, 2, 3, 5]; // 피라미드 층별 인원
     let currentIdx = 0;
+
     rows.forEach((count) => {
         const rowDiv = document.createElement("div");
         rowDiv.className = "pyramid-row";
+        
         for (let i = 0; i < count; i++) {
             const trainee = top11[currentIdx];
             const slot = document.createElement("div");
             slot.className = "top-card-slot";
+            
             if (trainee) {
                 slot.innerHTML = `
                     <div class="image-container">
@@ -164,9 +195,15 @@ function renderTop11() {
                         <div class="rank-badge">${currentIdx + 1}</div>
                         <button class="remove-btn" onclick="event.stopPropagation(); removeTrainee(${currentIdx})">×</button>
                     </div>
-                    <p class="name">${trainee.name}</p>`;
+                    <p class="name">${trainee.name}</p>
+                `;
             } else {
-                slot.innerHTML = `<div class="image-container empty"><div class="rank-badge">${currentIdx + 1}</div></div><p class="name">-</p>`;
+                slot.innerHTML = `
+                    <div class="image-container empty">
+                        <div class="rank-badge">${currentIdx + 1}</div>
+                    </div>
+                    <p class="name">-</p>
+                `;
             }
             rowDiv.appendChild(slot);
             currentIdx++;
@@ -175,30 +212,21 @@ function renderTop11() {
     });
 }
 
-// 5. 연습생 제거 및 리스트 초기화 함수 (생략 없이 다 있어야 함)
+// 6. 연습생 삭제
 function removeTrainee(index) {
     top11.splice(index, 1);
     renderTop11();
 }
 
-function initTraineeList() {
-    const listContainer = document.getElementById("trainee-list");
-    listContainer.innerHTML = "";
-    trainees.forEach((trainee) => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `<img src="${trainee.img}"><p>${trainee.name}</p>`;
-        card.onclick = () => selectTrainee(trainee);
-        listContainer.appendChild(card);
-    });
-}
-
-// 6. 저장 기능 (보내주신 코드 적용)
+// 7. 이미지 저장 (새 로고 + 아이디 포함)
 async function saveAsImage() {
     const logoArea = document.querySelector('.logo-container');
     const pyramidArea = document.querySelector('.top11-container');
     const removeBtns = document.querySelectorAll('.remove-btn');
     
+    if (!logoArea || !pyramidArea) return;
+
+    // 삭제 버튼 일시 숨김
     removeBtns.forEach(btn => btn.style.display = 'none');
 
     try {
@@ -209,29 +237,40 @@ async function saveAsImage() {
         const finalCanvas = document.createElement('canvas');
         const ctx = finalCanvas.getContext('2d');
 
+        // 로고 비율 및 여백 계산
         const logoHeight = logoCanvas.height * (pyramidCanvas.width / logoCanvas.width);
         const footerHeight = 150; 
 
         finalCanvas.width = pyramidCanvas.width;
         finalCanvas.height = logoHeight + pyramidCanvas.height + footerHeight;
 
+        // 배경색 채우기
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+        // 상단 로고 그리기
         ctx.drawImage(logoCanvas, 0, 0, pyramidCanvas.width, logoHeight);
+
+        // 중앙 피라미드 그리기
         ctx.drawImage(pyramidCanvas, 0, logoHeight);
 
+        // 하단 @itterashaiyade (검은색, 학교안심 바른돋움)
         ctx.fillStyle = "#000000";
         ctx.font = "bold 40px HakgyoansimBareunDotum";
         ctx.textAlign = "right";
         ctx.fillText("@itterashaiyade", finalCanvas.width - 60, finalCanvas.height - 60);
 
+        // 다운로드 실행
         const link = document.createElement("a");
         link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
         link.href = finalCanvas.toDataURL("image/png");
         link.click();
+        
     } catch (e) {
-        alert("저장 중 오류가 발생했습니다.");
+        console.error(e);
+        alert("이미지 저장 중 오류가 발생했습니다.");
     } finally {
+        // 삭제 버튼 복구
         removeBtns.forEach(btn => btn.style.display = 'flex');
     }
 }
