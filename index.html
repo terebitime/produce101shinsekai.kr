@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PRODUCE 101 SHINSEKAI</title>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     
     <style>
-        /* 1. 폰트 및 배경 설정 */
         @font-face {
             font-family: 'HakgyoansimBareunDotum';
             src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2310@1.0/HakgyoansimBareunDotumR.woff2') format('woff2');
@@ -17,15 +16,11 @@
 
         body {
             font-family: 'HakgyoansimBareunDotum', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            margin: 0; padding: 0; background-color: #f9f9f9;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        /* 2. 화면 표시용 스타일 */
+        /* 화면용 스타일 */
         .main-logo { width: 100%; max-width: 600px; display: block; margin: 0 auto; }
         .top11-container { width: 100%; max-width: 600px; margin: 20px 0; }
         .pyramid-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; }
@@ -42,42 +37,22 @@
             padding: 15px 30px; background: #0080ff; color: white; border: none; 
             border-radius: 30px; font-weight: bold; cursor: pointer; margin: 20px 0;
         }
+        .save-btn:disabled { background: #ccc; }
 
         .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; max-width: 600px; }
         .card { border: 1px solid #ddd; padding: 5px; text-align: center; cursor: pointer; background: white; border-radius: 10px; }
         .card img { width: 100%; border-radius: 5px; }
 
-        /* 3. ★ 저장 전용 영역 (정사각형 1:1 고정) */
-        #exportArea {
-            position: absolute;
-            top: 0;
-            left: -9999px; 
-            width: 1000px;
-            height: 1000px;
-            background: white;
-            overflow: hidden;
-        }
-
-        #exportInner {
-            width: 1000px;
-            height: 1000px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            padding: 60px 0;
-            box-sizing: border-box;
-        }
+        /* 저장 영역 (화면 밖) */
+        #exportArea { position: absolute; left: -9999px; top: 0; width: 1000px; height: 1000px; background: white; }
+        #exportInner { width: 1000px; height: 1000px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 60px 0; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
     <img src="image/header--logo_clean.jpg" class="main-logo">
-    
     <div id="top11" class="top11-container"></div>
-    
-    <button onclick="saveAsImage()" class="save-btn">나의 TOP 11 이미지로 저장하기</button>
-    
+    <button id="saveBtn" onclick="saveAsImage()" class="save-btn">나의 TOP 11 이미지로 저장하기</button>
     <div id="trainee-list" class="grid"></div>
 
     <div id="exportArea">
@@ -102,12 +77,11 @@
 
         function init() {
             const list = document.getElementById("trainee-list");
-            // trainees 데이터 존재 여부 확인
             if (typeof trainees !== 'undefined') {
                 trainees.forEach(t => {
                     const div = document.createElement("div");
                     div.className = "card";
-                    div.innerHTML = `<img src="${t.img}"><p>${t.name}</p>`;
+                    div.innerHTML = `<img src="${t.img}" loading="lazy"><p>${t.name}</p>`;
                     div.onclick = () => {
                         if (top11.length < 11 && !top11.includes(t)) {
                             top11.push(t);
@@ -133,13 +107,7 @@
                     const slot = document.createElement("div");
                     slot.className = "top-card-slot";
                     if (t) {
-                        slot.innerHTML = `
-                            <div class="image-container">
-                                <img src="${t.img}">
-                                <div class="rank-badge">${idx + 1}</div>
-                                <button class="remove-btn" onclick="removeT(${idx})">×</button>
-                            </div>
-                            <p style="font-size:12px; margin:5px 0;">${t.name}</p>`;
+                        slot.innerHTML = `<div class="image-container"><img src="${t.img}"><div class="rank-badge">${idx + 1}</div><button class="remove-btn" onclick="removeT(${idx})">×</button></div><p style="font-size:12px; margin:5px 0;">${t.name}</p>`;
                     } else {
                         slot.innerHTML = `<div class="image-container"></div><p>-</p>`;
                     }
@@ -157,13 +125,16 @@
 
         async function saveAsImage() {
             if (top11.length === 0) return alert("연습생을 선택하세요!");
+            
+            const btn = document.getElementById("saveBtn");
+            btn.innerText = "이미지 생성 중...";
+            btn.disabled = true;
 
             const expPyramid = document.getElementById("exportPyramid");
             expPyramid.innerHTML = "";
             
-            const rows = [1, 2, 3, 5];
             let idx = 0;
-            rows.forEach(count => {
+            [1, 2, 3, 5].forEach(count => {
                 const row = document.createElement("div");
                 row.style.cssText = "display: flex; justify-content: center; gap: 20px; width: 100%;";
                 for (let i = 0; i < count; i++) {
@@ -171,9 +142,10 @@
                     const slot = document.createElement("div");
                     slot.style.cssText = "width: 140px; text-align: center;";
                     if (t) {
+                        // 이미지에 crossorigin="anonymous" 강제 부여 (보안 우회)
                         slot.innerHTML = `
                             <div style="width: 115px; height: 115px; border-radius: 50%; border: 5px solid #0080ff; overflow: hidden; background: #fff; margin: 0 auto; position: relative;">
-                                <img src="${t.img}" style="width: 100%; height: 100%; object-fit: cover;">
+                                <img src="${t.img}" style="width: 100%; height: 100%; object-fit: cover;" crossorigin="anonymous">
                                 <div style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); background: #0080ff; color: #fff; border-radius: 10px; font-weight: 900; font-size: 13px; padding: 2px 10px;">${idx + 1}</div>
                             </div>
                             <div style="margin-top: 12px; font-size: 18px; font-weight: 900; color: #111;">${t.name}</div>
@@ -187,23 +159,38 @@
                 expPyramid.appendChild(row);
             });
 
-            // html2canvas 옵션 설정 (정사각형 캡처)
-            const area = document.getElementById("exportInner");
-            const canvas = await html2canvas(area, {
-                scale: 2,
-                useCORS: true,
-                width: 1000,
-                height: 1000
-            });
+            try {
+                // 이미지가 그려질 때까지 대기
+                await new Promise(resolve => setTimeout(resolve, 1000));
 
-            const link = document.createElement("a");
-            link.download = "TOP11_SQUARE.png";
-            link.href = canvas.toDataURL();
-            link.click();
+                const area = document.getElementById("exportInner");
+                const canvas = await html2canvas(area, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    width: 1000,
+                    height: 1000,
+                    backgroundColor: "#ffffff"
+                });
+
+                // 다운로드 로직 (모바일 호환성 강화)
+                const link = document.createElement("a");
+                link.href = canvas.toDataURL("image/png");
+                link.download = "MY_TOP11_SQUARE.png";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (e) {
+                console.error(e);
+                alert("저장에 실패했습니다. 크롬 브라우저 사용을 권장합니다.");
+            } finally {
+                btn.innerText = "나의 TOP 11 이미지로 저장하기";
+                btn.disabled = false;
+            }
         }
 
-        // 페이지 로드 시 실행
         window.onload = init;
     </script>
 </body>
 </html>
+
