@@ -1,7 +1,7 @@
 const trainees = [
-  { name: "아담 나가이", img: "image/1.jpg" },
-  { name: "나카마루 아쥬", img: "image/2.jpg" },
-  { name: "엄 쑹카바띤", img: "image/3.jpg" },
+  { name: "아담 나가이", img: "./image/1.jpg" },
+  { name: "나카마루 아쥬", img: "./image/2.jpg" },
+  { name: "엄 쑹카바띤", img: "./image/3.jpg" },
   { name: "아처 위", img: "image/4.jpg" },
   { name: "시노가야 아유무", img: "image/5.jpg" },
   { name: "코바야시 치사토", img: "image/6.jpg" },
