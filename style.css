@@ -1,4 +1,4 @@
-/* 폰트 불러오기 */
+/* 1. 웹폰트 불러오기 */
 @font-face {
     font-family: 'HakgyoansimBareunDotum';
     src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2403-2@1.0/HakgyoansimBareunDotumR.woff2') format('woff2');
@@ -6,41 +6,48 @@
     font-style: normal;
 }
 
-/* 전체 적용 */
+/* 2. 전체 적용 (중요: Noto Sans 설정을 지우고 이걸로 통일) */
 * {
-    font-family: 'HakgyoansimBareunDotum', sans-serif;
+    font-family: 'HakgyoansimBareunDotum', sans-serif !important;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-/* 특정 부분만 강조하고 싶을 때 */
-h1, .name, .rank-badge {
-    font-family: 'HakgyoansimBareunDotum', sans-serif;
-    font-weight: bold; /* 이름이나 순위는 굵게 */
-}body {
-  font-family: 'Noto Sans KR', sans-serif;
+body {
+    background-color: #f8f9fa;
+    text-align: center; /* 텍스트 중앙 정렬 */
+    -webkit-font-smoothing: antialiased;
 }
 
-h1 { margin-top: 20px; }
+h1 { 
+    margin: 40px 0 20px 0; 
+    font-weight: 700;
+    color: #222;
+}
 
+/* 3. 연습생 리스트 그리드 */
 #trainee-list {
     display: grid;
-    /* 모바일에서는 3열, PC에서는 6~8열 정도로 자동 조절 */
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
     gap: 20px;
     padding: 20px;
-    max-width: 1000px;
-    margin: 0 auto; /* 가운데 정렬 */
+    max-width: 1100px;
+    margin: 0 auto;
 }
 
+/* 4. 연습생 카드 스타일 */
 .card {
     background: #fff;
     border-radius: 15px;
-    padding: 10px;
+    padding: 15px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     transition: all 0.2s ease-in-out;
+    cursor: pointer;
 }
 
 .card:hover {
-    transform: translateY(-5px); /* 살짝 떠오르는 효과 */
+    transform: translateY(-5px);
     box-shadow: 0 8px 15px rgba(0, 123, 255, 0.2);
 }
 
@@ -50,26 +57,36 @@ h1 { margin-top: 20px; }
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 8px;
+    transition: 0.3s;
 }
 
 .card:hover img {
-  transform: scale(1.1); /* 마우스 올리면 살짝 커짐 */
-  border: 2px solid #007bff;
+    transform: scale(1.1);
+    border: 3px solid #007bff;
 }
 
+.card .name-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-top: 5px;
+}
+
+/* 5. 버튼 스타일 */
 .button-area {
-    text-align: center;
-    margin: 20px 0 40px 0;
+    display: flex;
+    justify-content: center;
+    margin: 30px 0;
 }
 
 .save-btn {
-    background-color: #007bff; /* 메인 블루 */
+    background-color: #007bff;
     color: white;
     border: none;
-    padding: 12px 24px;
-    font-size: 16px;
+    padding: 15px 30px;
+    font-size: 18px;
     font-weight: bold;
-    border-radius: 30px;
+    border-radius: 50px;
     cursor: pointer;
     box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
     transition: 0.3s;
@@ -78,4 +95,17 @@ h1 { margin-top: 20px; }
 .save-btn:hover {
     background-color: #0056b3;
     transform: scale(1.05);
+}
+
+/* 6. 피라미드 및 기타 레이아웃 */
+.image-container.empty {
+    background-color: #f0f0f0;
+    border: 2px dashed #ccc;
+    border-radius: 50%; /* 빈 원형 유지 */
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
