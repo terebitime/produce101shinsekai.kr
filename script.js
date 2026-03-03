@@ -132,11 +132,11 @@ window.onload = function() {
 function initTraineeList() {
     const listContainer = document.getElementById("trainee-list");
     listContainer.innerHTML = "";
-    // trainees.js에 정의된 명단을 사용합니다
+    // trainees.js의 데이터를 사용합니다
     trainees.forEach((trainee) => {
         const card = document.createElement("div");
         card.className = "card";
-        card.innerHTML = `<img src="${trainee.img}"><p class="name-text">${trainee.name}</p>`;
+        card.innerHTML = `<img src="${trainee.img}"><p>${trainee.name}</p>`;
         card.onclick = () => selectTrainee(trainee);
         listContainer.appendChild(card);
     });
@@ -182,38 +182,70 @@ function removeTrainee(index) {
     renderTop11();
 }
 
-// ✅ 최종 저장 함수: 로고 포함 + 정사각형 비율 + 검은색 @itterashaiyade
+// ✅ 저장 기능: 새 로고(header--logo_clean.jpg) + 하단 @itterashaiyade (검은색)
 async function saveAsImage() {
     const logoArea = document.querySelector('.logo-container');
     const pyramidArea = document.querySelector('.top11-container');
     const removeBtns = document.querySelectorAll('.remove-btn');
+    
     removeBtns.forEach(btn => btn.style.display = 'none');
 
-    const options = { scale: 3, useCORS: true, backgroundColor: "#ffffff" };
-    const logoCanvas = await html2canvas(logoArea, options);
-    const pyramidCanvas = await html2canvas(pyramidArea, options);
+    try {
+        const options = { scale: 3, useCORS: true, backgroundColor: "#ffffff" };
+        const logoCanvas = await html2canvas(logoArea, options);
+        const pyramidCanvas = await html2canvas(pyramidArea, options);
 
-    const finalCanvas = document.createElement('canvas');
-    const ctx = finalCanvas.getContext('2d');
-    const logoHeight = logoCanvas.height * (pyramidCanvas.width / logoCanvas.width);
+        const finalCanvas = document.createElement('canvas');
+        const ctx = finalCanvas.getContext('2d');
 
-    finalCanvas.width = pyramidCanvas.width;
-    finalCanvas.height = logoHeight + pyramidCanvas.height + 150;
+        // 로고 비율 유지하며 높이 계산
+        const logoHeight = logoCanvas.height * (pyramidCanvas.width / logoCanvas.width);
+        const footerHeight = 150; 
 
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-    ctx.drawImage(logoCanvas, 0, 0, pyramidCanvas.width, logoHeight);
-    ctx.drawImage(pyramidCanvas, 0, logoHeight);
+        finalCanvas.width = pyramidCanvas.width;
+        finalCanvas.height = logoHeight + pyramidCanvas.height + footerHeight;
 
-    // 하단 워터마크: 검은색, 학교안심 바른돋움체
-    ctx.fillStyle = "#000000";
-    ctx.font = "bold 36px HakgyoansimBareunDotum";
-    ctx.textAlign = "right";
-    ctx.fillText("@itterashaiyade", finalCanvas.width - 60, finalCanvas.height - 60);
+        // 배경 그리기
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
 
-    const link = document.createElement("a");
-    link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
-    link.href = finalCanvas.toDataURL("image/png");
-    link.click();
-    removeBtns.forEach(btn => btn.style.display = 'flex');
+        // 상단 로고 그리기
+        ctx.drawImage(logoCanvas, 0, 0, pyramidCanvas.width, logoHeight);
+
+        // 피라미드 그리기
+        ctx.drawImage(pyramidCanvas, 0, logoHeight);
+
+        // 하단 @itterashaiyade (검은색, 학교안심 바른돋움)
+        ctx.fillStyle = "#000000";
+        ctx.font = "bold 40px HakgyoansimBareunDotum";
+        ctx.textAlign = "right";
+        ctx.fillText("@itterashaiyade", finalCanvas.width - 60, finalCanvas.height - 60);
+
+        const link = document.createElement("a");
+        link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
+        link.href = finalCanvas.toDataURL("image/png");
+        link.click();
+    } catch (e) {
+        alert("저장 중 오류가 발생했습니다.");
+    } finally {
+        removeBtns.forEach(btn => btn.style.display = 'flex');
+    }
+}
+// 연습생 선택 로직 수정
+function selectTrainee(trainee) {
+    // 1. 이미 선택된 연습생인지 확인
+    if (top11.includes(trainee)) {
+        alert("이미 선택된 연습생입니다."); // 중복 클릭 시 알림 창 표시
+        return;
+    }
+    
+    // 2. 11명이 꽉 찼는지 확인
+    if (top11.length >= 11) {
+        alert("최대 11명까지만 선택할 수 있습니다.");
+        return;
+    }
+
+    // 3. 목록에 추가 및 다시 그리기
+    top11.push(trainee);
+    renderTop11();
 }
