@@ -49,3 +49,24 @@ function removeTrainee(index) {
   top11.splice(index, 1);
   renderTop11();
 }
+function saveAsImage() {
+    const target = document.getElementById("top11");
+
+    // 이미지가 하나도 없으면 경고
+    if (top11.length === 0) {
+        alert("먼저 연습생을 선택해주세요!");
+        return;
+    }
+
+    html2canvas(target, {
+        backgroundColor: "#ffffff", // 배경을 흰색으로
+        useCORS: true,             // 깃허브 이미지 불러오기 허용
+        scale: 2,                  // 고화질 설정
+        logging: false             // 콘솔 로그 끄기
+    }).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "my-shinsekai-top11.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+    });
+}
