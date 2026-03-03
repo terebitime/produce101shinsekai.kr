@@ -1,4 +1,4 @@
-// 1. 데이터 (119명 그대로 유지)
+// 1. 데이터 (119명 연습생 정보)
 const trainees = [
     { name: "아담 나가이", img: "image/1.jpg" },
     { name: "나카마루 아쥬", img: "image/2.jpg" },
@@ -121,17 +121,16 @@ const trainees = [
     { name: "오카모토 유토", img: "image/119.jpg" }
 ];
 
-// 1. 전역 변수 설정
+// 2. 전역 변수 설정
 let top11 = [];
 const top11Container = document.getElementById("top11");
 
 window.onload = function() {
-    if (typeof trainees !== 'undefined') {
-        initTraineeList();
-    }
+    initTraineeList();
     renderTop11();
 };
 
+// 연습생 리스트 생성
 function initTraineeList() {
     const listContainer = document.getElementById("trainee-list");
     if (!listContainer) return;
@@ -145,14 +144,74 @@ function initTraineeList() {
     });
 }
 
-// ✅ 1. 중복 알림 수정: 이름(name)을 직접 비교하여 확실하게 띄우기
+// 연습생 선택 (중복 방지)
+function selectTrainee(trainee) {
+    const isAlreadySelected = top11.some(item => item.name === trainee.name);
+    
+    if (isAlreadySelected) {
+        alert("이미 선택된 연습생입니다."); 
+        return;
+    }
+    
+    if (top11.length >= 11) {
+        alert("최대 11명까지만 선택할 수 있습니다.");
+        return;
+    }
+
+    top11.push(trainee);
+    renderTop11();
+}
+
+// 화면용 피라미드 렌더링
+function renderTop11() {
+    if (!top11Container) return;
+    top11Container.innerHTML = "";
+    const rows = [1, 2, 3, 5];
+    let currentIdx = 0;
+    rows.forEach((count) => {
+        const rowDiv = document.createElement("div");
+        rowDiv.className = "pyramid-row";
+        for (let i = 0; i < count; i++) {
+            const trainee = top11[currentIdx];
+            const slot = document.createElement("div");
+            slot.className = "top-card-slot";
+            if (trainee) {
+                slot.innerHTML = `
+                    <div class="image-container">
+                        <img src="${trainee.img}">
+                        <div class="rank-badge">${currentIdx + 1}</div>
+                        <button class="remove-btn" onclick="event.stopPropagation(); removeTrainee(${currentIdx})">×</button>
+                    </div>
+                    <p class="name">${trainee.name}</p>`;
+            } else {
+                slot.innerHTML = `<div class="image-container empty"><div class="rank-badge">${currentIdx + 1}</div></div><p class="name">-</p>`;
+            }
+            rowDiv.appendChild(slot);
+            currentIdx++;
+        }
+        top11Container.appendChild(rowDiv);
+    });
+}
+
+// 선택 해제
+function removeTrainee(index) {
+    top11.splice(index, 1);
+    renderTop11();
+}
+
+// ✅ 이미지 저장 기능 (정사각형 및 학교안심 바른돋움 적용)
 async function saveAsImage() {
     const exportPyramid = document.getElementById("exportPyramid");
     const exportArea = document.getElementById("exportArea");
     
+    if (top11.length === 0) {
+        alert("연습생을 한 명이라도 선택해 주세요!");
+        return;
+    }
+
+    // 저장용 영역 비우고 새로 생성
     exportPyramid.innerHTML = "";
     
-    // 1-2-3-5 구조 생성 (기존 로직 유지)
     const rows = [1, 2, 3, 5];
     let currentIdx = 0;
 
@@ -171,7 +230,7 @@ async function saveAsImage() {
                         <img src="${trainee.img}" style="width: 100%; height: 100%; object-fit: cover;">
                         <div style="position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); background: #0080ff; color: #fff; border-radius: 999px; font-weight: 900; font-size: 11px; padding: 4px 10px;">${currentIdx + 1}</div>
                     </div>
-                    <div style="margin-top: 12px; font-size: 17px; font-weight: 900; color: #111; font-family: sans-serif;">${trainee.name}</div>
+                    <div style="margin-top: 12px; font-size: 17px; font-weight: 900; color: #111;">${trainee.name}</div>
                 `;
             } else {
                 slot.innerHTML = `<div style="width: 120px; height: 120px; border-radius: 50%; background: #f0f0f0; opacity: 0.5; margin: 0 auto;"></div>`;
@@ -183,22 +242,22 @@ async function saveAsImage() {
     });
 
     try {
-        // ★ 폰트 로딩 대기 시간을 조금 더 늘려줍니다 (800ms)
+        // 폰트와 이미지가 렌더링될 시간을 줍니다.
         await new Promise(resolve => setTimeout(resolve, 800));
 
         const canvas = await html2canvas(exportArea, {
             scale: 2, 
             useCORS: true,
             backgroundColor: "#ffffff",
-            width: 1000,   // 1:1 비율 고정
-            height: 1000,  // 1:1 비율 고정
+            width: 1000,   // 가로 1000px 고정
+            height: 1000,  // 세로 1000px 고정 (정사각형 핵심)
             windowWidth: 1000,
             windowHeight: 1000,
             logging: false
         });
 
         const link = document.createElement("a");
-        link.download = "SHINSEKAI_TOP11_SQUARE.png";
+        link.download = "SHINSEKAI_TOP11_PICK.png";
         link.href = canvas.toDataURL("image/png", 1.0);
         link.click();
     } catch (e) {
