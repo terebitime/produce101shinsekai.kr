@@ -1,56 +1,52 @@
-let selected = [];
+const traineeList = document.getElementById("trainee-list");
+const top11Container = document.getElementById("top11");
 
-const list = document.getElementById("trainee-list");
-const countText = document.getElementById("count");
+let top11 = [];
 
-trainees.forEach((t, index) => {
-  const div = document.createElement("div");
-  div.className = "card";
-  div.innerHTML = `
-    <img src="${t.img}">
-    <p>${t.name}</p>
+// 🔹 연습생 전체 출력
+trainees.forEach((trainee, index) => {
+  const card = document.createElement("div");
+  card.className = "card";
+
+  card.innerHTML = `
+    <img src="${trainee.img}" alt="${trainee.name}">
+    <p>${trainee.name}</p>
   `;
-  div.onclick = () => toggleSelect(t, div);
-  list.appendChild(div);
+
+  card.addEventListener("click", () => selectTrainee(trainee));
+
+  traineeList.appendChild(card);
 });
 
-function toggleSelect(t, element) {
-  if (selected.includes(t)) {
-    selected = selected.filter(x => x !== t);
-    element.classList.remove("selected");
-  } else {
-    if (selected.length >= 11) {
-      alert("11명까지만 선택 가능!");
-      return;
-    }
-    selected.push(t);
-    element.classList.add("selected");
+// 🔹 선택 함수
+function selectTrainee(trainee) {
+  // 이미 선택된 경우 무시
+  if (top11.includes(trainee)) return;
+
+  // 11명 초과 방지
+  if (top11.length >= 11) {
+    alert("TOP11은 최대 11명까지 선택 가능!");
+    return;
   }
-  countText.innerText = `${selected.length} / 11 선택됨`;
+
+  top11.push(trainee);
+  renderTop11();
 }
 
-function generateTop11() {
-  const result = document.getElementById("result");
-  result.innerHTML = "";
+// 🔹 TOP11 화면 출력
+function renderTop11() {
+  top11Container.innerHTML = "";
 
-  selected.forEach((t, index) => {
-    const div = document.createElement("div");
-    div.className = index === 0 ? "top1" : "top";
-    div.innerHTML = `
+  top11.forEach((trainee, index) => {
+    const card = document.createElement("div");
+    card.className = "top-card";
+
+    card.innerHTML = `
       <div class="rank">${index + 1}</div>
-      <img src="${t.img}">
-      <p>${t.name}</p>
+      <img src="${trainee.img}" alt="${trainee.name}">
+      <p>${trainee.name}</p>
     `;
-    result.appendChild(div);
-  });
-}
 
-function downloadImage() {
-  html2canvas(document.querySelector("#result-wrapper"))
-    .then(canvas => {
-      const link = document.createElement("a");
-      link.download = "top11.png";
-      link.href = canvas.toDataURL();
-      link.click();
-    });
+    top11Container.appendChild(card);
+  });
 }
