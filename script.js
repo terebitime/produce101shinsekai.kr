@@ -235,20 +235,21 @@ async function saveAsImage() {
         await document.fonts.ready;
         await new Promise(resolve => setTimeout(resolve, 1200));
 
-        const canvas = await html2canvas(exportArea, {
-            scale: 2, 
-            useCORS: true,
-            backgroundColor: "#ffffff",
-            // ★ 중요: 캔버스의 크기를 1000x1000으로 엄격하게 고정
-            width: 1000,
-            height: 1000,
-            windowWidth: 1000,
-            windowHeight: 1000,
-            x: 0,
-            y: 0,
-            scrollX: 0,
-            scrollY: 0
-        });
+
+const canvas = await html2canvas(exportArea, {
+    scale: 2,             // 고화질 저장
+    useCORS: true,        // 이미지 로딩 허용
+    backgroundColor: "#ffffff",
+    width: 1000,          // 가로 1000px 고정
+    height: 1000,         // 세로 1000px 고정 (이게 없으면 길어짐)
+    windowWidth: 1000,    // 뷰포트 가로 고정
+    windowHeight: 1000,   // 뷰포트 세로 고정 (주변 여백 무시)
+    x: 0,
+    y: 0,
+    scrollX: 0,
+    scrollY: 0,
+    logging: false
+});
 
         const link = document.createElement("a");
         link.download = "TOP11_PICK.png";
