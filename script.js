@@ -124,56 +124,62 @@ const trainees = [
 // (상단에 기존 trainees 데이터 배열을 유지하세요!)
 
 async function saveAsImage() {
-    // 1. 캡처할 영역 설정 (로고 + 피라미드 전체를 포함하기 위해 상위 컨테이너 생성)
     const logoArea = document.querySelector('.logo-container');
     const pyramidArea = document.querySelector('.top11-container');
     
-    // 삭제 버튼 잠시 숨기기
+    // 삭제 버튼 숨기기
     const removeBtns = document.querySelectorAll('.remove-btn');
     removeBtns.forEach(btn => btn.style.display = 'none');
 
-    // 2. 전체 캔버스 캡처 (로고 + 피라미드 합치기)
-    // 팁: 두 영역을 각각 캡처해서 하나로 합치는 방식이 가장 깔끔합니다.
-    const logoCanvas = await html2canvas(logoArea, { scale: 2 });
-    const pyramidCanvas = await html2canvas(pyramidArea, { scale: 2, backgroundColor: "#ffffff" });
+    try {
+        // 이미지 로딩을 확실히 기다리기 위해 0.5초 대기
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-    const finalCanvas = document.createElement('canvas');
-    const ctx = finalCanvas.getContext('2d');
+        // 1. 로고와 피라미드 영역 각각 캡처
+        const logoCanvas = await html2canvas(logoArea, { 
+            scale: 2, 
+            useCORS: true, 
+            allowTaint: true 
+        });
+        const pyramidCanvas = await html2canvas(pyramidArea, { 
+            scale: 2, 
+            useCORS: true, 
+            allowTaint: true,
+            backgroundColor: "#ffffff" 
+        });
 
-    // 최종 이미지 크기 설정 (로고 높이 + 피라미드 높이 + 하단 문구 공간)
-    finalCanvas.width = pyramidCanvas.width;
-    finalCanvas.height = logoCanvas.height * (pyramidCanvas.width / logoCanvas.width) + pyramidCanvas.height + 150;
+        const finalCanvas = document.createElement('canvas');
+        const ctx = finalCanvas.getContext('2d');
 
-    // 배경 흰색 채우기
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+        // 2. 최종 이미지 크기 계산
+        const logoHeight = logoCanvas.height * (pyramidCanvas.width / logoCanvas.width);
+        finalCanvas.width = pyramidCanvas.width;
+        finalCanvas.height = logoHeight + pyramidCanvas.height + 120; // 하단 여백
 
-    // [상단] 홈페이지 로고 그리기
-    const logoHeight = logoCanvas.height * (pyramidCanvas.width / logoCanvas.width);
-    ctx.drawImage(logoCanvas, 0, 0, pyramidCanvas.width, logoHeight);
+        // 3. 배경 및 이미지 그리기
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+        ctx.drawImage(logoCanvas, 0, 0, pyramidCanvas.width, logoHeight);
+        ctx.drawImage(pyramidCanvas, 0, logoHeight);
 
-    // [중앙] 피라미드 이미지 그리기
-    ctx.drawImage(pyramidCanvas, 0, logoHeight);
+        // 4. 하단 @itterashaiyade (검은색, 학교안심 바른돋움)
+        ctx.fillStyle = "#000000"; 
+        ctx.font = "bold 32px HakgyoansimBareunDotum"; 
+        ctx.textAlign = "right";
+        ctx.fillText("@itterashaiyade", finalCanvas.width - 50, finalCanvas.height - 50);
 
-    // [하단] @itterashaiyade 텍스트 추가
-    ctx.fillStyle = "#000000"; // 검은색 폰트 요청 반영
-    ctx.font = "bold 32px HakgyoansimBareunDotum"; // 학교안심 바른돋움체
-    ctx.textAlign = "right";
-    
-    // 이미지 오른쪽 하단 여백에 배치
-    ctx.fillText("@itterashaiyade", finalCanvas.width - 50, finalCanvas.height - 60);
+        // 5. 다운로드
+        const link = document.createElement("a");
+        link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
+        link.href = finalCanvas.toDataURL("image/png");
+        link.click();
 
-    // 3. 파일 다운로드
-    const link = document.createElement("a");
-    link.download = "PRODUCE_101_SHINSEKAI_TOP11.png";
-    link.href = finalCanvas.toDataURL("image/png");
-    link.click();
-
-    // 삭제 버튼 다시 보이게 복구
-    removeBtns.forEach(btn => btn.style.display = 'flex');
+    } catch (error) {
+        console.error("이미지 생성 중 오류 발생:", error);
+        alert("이미지를 생성하는 데 문제가 발생했습니다. 페이지를 새로고침 해보세요!");
+    } finally {
+        // 삭제 버튼 복구
+        removeBtns.forEach(btn => btn.style.display = 'flex');
+    }
 }
-
-/* 6. 리스트 영역 */
-#trainee-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
-.card { background: #fff; border-radius: 12px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-.card img { width: 100%; aspect-ratio: 1 / 1; border-radius: 10px; object-fit: cover; }
+    
